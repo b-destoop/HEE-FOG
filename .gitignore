@@ -50,3 +50,8 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# own aditions
+/build/
+/cmake-build-debug/
+/managed_components/
