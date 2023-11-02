@@ -50,12 +50,10 @@ the same time" - more or less.
 - The other files do not need to be handled.
 
 ## more esp-idf info
-
-[build system](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html)
-
-[components/component manager](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-component-manager.html)
-
-[POSIX threads](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/pthread.html)
+- [pinouts and stuff](https://learn.adafruit.com/adafruit-huzzah32-esp32-feather/pinouts)
+- [build system](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html)
+- [components/component manager](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-component-manager.html)
+- [POSIX threads](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/pthread.html)
 
 ## Common problems
 
