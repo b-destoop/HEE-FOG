@@ -2,7 +2,15 @@
 
 An ESP32 microcontroller project for FOG episodes with Parkinson's patients.
 
-## structure of the code
+## code strategy
+
+2 threads are running on the ESP. Threads are a way to make a computer do multiple things asynchronously, meaning "at
+the same time" - more or less. 
+
+- Thread 1 is responsible for reading out the IMU data constantly and calculating the rhythm of the current stride.
+- Thread 2 is responsible for giving the actuator feedback to the patient.
+
+## directory structure
 
 ```shell
 ├── build
@@ -41,7 +49,7 @@ An ESP32 microcontroller project for FOG episodes with Parkinson's patients.
 - README.md contains documentation.
 - The other files do not need to be handled.
 
-## more info
+## more esp-idf info
 
 [build system](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html)
 
