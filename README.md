@@ -68,3 +68,5 @@ compgen -g
 sudo usermod -a -G tty [username] 
 sudo usermod -a -G dialout [username]
 ```
+
+this is some random text
