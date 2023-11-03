@@ -2,6 +2,19 @@
 
 An ESP32 microcontroller project for FOG episodes with Parkinson's patients.
 
+## table of contents
+
+<!-- TOC -->
+* [HEE-FOG](#hee-fog)
+  * [table of contents](#table-of-contents)
+  * [code strategy](#code-strategy)
+  * [directory structure](#directory-structure)
+  * [more esp-idf info](#more-esp-idf-info)
+  * [Common problems](#common-problems)
+    * [WINDOWS - CLion setup tutorial on Windows (old GUI)](#windows---clion-setup-tutorial-on-windows-old-gui)
+    * [LINUX - TTY permission error](#linux---tty-permission-error)
+<!-- TOC -->
+
 ## code strategy
 
 2 threads are running on the ESP. Threads are a way to make a computer do multiple things asynchronously, meaning "at
@@ -50,6 +63,8 @@ the same time" - more or less.
 - The other files do not need to be handled.
 
 ## more esp-idf info
+
+[The ISP-IDF documentation website](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/)
 
 - [pinouts and stuff](https://learn.adafruit.com/adafruit-huzzah32-esp32-feather/pinouts)
 - [build system](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html)
