@@ -5,7 +5,7 @@ An ESP32 microcontroller project for FOG episodes with Parkinson's patients.
 ## code strategy
 
 2 threads are running on the ESP. Threads are a way to make a computer do multiple things asynchronously, meaning "at
-the same time" - more or less. 
+the same time" - more or less.
 
 - Thread 1 is responsible for reading out the IMU data constantly and calculating the rhythm of the current stride.
 - Thread 2 is responsible for giving the actuator feedback to the patient.
@@ -50,12 +50,17 @@ the same time" - more or less.
 - The other files do not need to be handled.
 
 ## more esp-idf info
+
 - [pinouts and stuff](https://learn.adafruit.com/adafruit-huzzah32-esp32-feather/pinouts)
 - [build system](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html)
 - [components/component manager](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-component-manager.html)
 - [POSIX threads](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/pthread.html)
 
 ## Common problems
+
+### WINDOWS - CLion setup tutorial on Windows (old GUI)
+
+[The good people from Jetbrains (the company behind CLion) have made a nice tutorial for you :)](https://www.youtube.com/watch?v=M6fa7tzZdLw&t=482s)
 
 ### LINUX - TTY permission error
 
