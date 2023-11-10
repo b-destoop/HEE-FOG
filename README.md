@@ -7,13 +7,18 @@ An ESP32 microcontroller project for FOG episodes with Parkinson's patients.
 <!-- TOC -->
 * [HEE-FOG](#hee-fog)
   * [table of contents](#table-of-contents)
+  * [pinouts](#pinouts)
   * [code strategy](#code-strategy)
   * [directory structure](#directory-structure)
   * [more esp-idf info](#more-esp-idf-info)
   * [Common problems](#common-problems)
     * [WINDOWS - CLion setup tutorial on Windows (old GUI)](#windows---clion-setup-tutorial-on-windows-old-gui)
     * [LINUX - TTY permission error](#linux---tty-permission-error)
+    * [LINUX - exit idf.py monitor](#linux---exit-idfpy-monitor)
 <!-- TOC -->
+
+## pinouts
+![pinout](https://cdn-learn.adafruit.com/assets/assets/000/111/179/original/wireless_Adafruit_HUZZAH32_ESP32_Feather_Pinout.png?1651089809)
 
 ## code strategy
 
