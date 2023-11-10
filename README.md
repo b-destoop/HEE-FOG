@@ -97,4 +97,8 @@ sudo usermod -a -G tty [username]
 sudo usermod -a -G dialout [username]
 ```
 
-this is some random text
+### LINUX - exit idf.py monitor
+[idf docs](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-monitor.html)
+try:
+ctrl + alt_gr + ]
+
