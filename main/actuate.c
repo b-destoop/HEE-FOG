@@ -10,7 +10,7 @@
 #include "sdkconfig.h"
 
 #define BLINK_GPIO 13
-#define AMOUNT_OF_BLINKS 3
+#define AMOUNT_OF_BLINKS 5
 
 static uint8_t s_led_state = 0;
 static const char *TAG = "actuate";

@@ -1,3 +1,4 @@
+#include <sys/cdefs.h>
 //
 // Created by bert on 2/11/23.
 //
@@ -5,6 +6,7 @@
 #include "analyze.h"
 
 #include <stdio.h>
+#include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
@@ -15,4 +17,6 @@ static const char *TAG = "analyze";
 
 void analyze_main(){
     ESP_LOGI(TAG, "Analyze main started");
+
+    ESP_LOGI(TAG, "Analyze main ended");
 }
