@@ -27,5 +27,8 @@ void blink_x_times(int amount) {
 }
 
 void actuate_main() {
+    ESP_LOGI(TAG, "Main started");
     blink_x_times(AMOUNT_OF_BLINKS);
+    ESP_LOGI(TAG, "Main ending...");
+    vTaskDelete(NULL);
 }
