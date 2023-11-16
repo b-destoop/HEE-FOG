@@ -16,7 +16,8 @@
 static const char *TAG = "analyze";
 
 void analyze_main(){
-    ESP_LOGI(TAG, "Analyze main started");
+    ESP_LOGI(TAG, "Main started");
 
-    ESP_LOGI(TAG, "Analyze main ended");
+    ESP_LOGI(TAG, "Main ending...");
+    vTaskDelete(NULL);
 }
