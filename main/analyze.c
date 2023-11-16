@@ -10,7 +10,7 @@
 #include "esp_log.h"
 #include "sdkconfig.h"
 
-static const char *TAG = "analyze";
+static const char *TAG = "ANALYZE";
 
 void analyze_main(){
     ESP_LOGI(TAG, "Main started");
