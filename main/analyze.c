@@ -78,19 +78,44 @@ void analyze_main(){
     }
 
     wakeUpMPU6050();  // Wake up!!!
-
+    int ARRAY_SIZE = 50; // how many data elements you want in the array 
     uint8_t data[14]; // 14 bytes for 3 axes of accelerometer, 3 axes of gyroscope (we also got a temp sensor in there you know... xxx)
+    float gyroscopeDataX[ARRAY_SIZE]; // array with gyro data of the X axis, initial list is filled with zero's
+    float gyroscopeDataY[ARRAY_SIZE]; // array with gyro data of the Y axis, initial list is filled with zero's
+    float gyroscopeDataZ[ARRAY_SIZE]; // array with gyro data of the Z axis, initial list is filled with zero's
+    float AccelerometerDataX[ARRAY_SIZE]; // array with gyro data of the X axis, initial list is filled with zero's
+    float AccelerometerDataY[ARRAY_SIZE]; // array with gyro data of the Y axis, initial list is filled with zero's
+    float AccelerometerDataZ[ARRAY_SIZE]; // you get the point don't you?
+    int itterator = 0; 
 
     while (1) {
         if (i2c_master_read_slave(MPU6050_ADDR, 0x3B, data, sizeof(data)) == ESP_OK) {
-            // Extract accelerometer values
-            int16_t accel_x = (data[0] << 8) | data[1];
-            int16_t accel_y = (data[2] << 8) | data[3];
-            int16_t accel_z = (data[4] << 8) | data[5];
             // now the same with the gyroscope 
-            int16_t gyro_x = (data[8] << 8) | data[9];
-            int16_t gyro_y = (data[10] << 8) | data[11];
-            int16_t gyro_z = (data[12] << 8) | data[13];
+            int16_t gyro_x = (data[0] << 8) | data[1];
+            int16_t gyro_y = (data[2] << 8) | data[3];
+            int16_t gyro_z = (data[4] << 8) | data[5];
+            // Extract accelerometer values
+            int16_t accel_x = (data[8] << 8) | data[9];
+            int16_t accel_y = (data[10] << 8) | data[11];
+            int16_t accel_z = (data[12] << 8) | data[13];
+            
+            //shift alle data op one place and 'deletes' the last/ oldest element
+            for (int i = ARRAY_SIZE - 1; i > 0; --i) {
+            gyroscopeDataX[i] = gyroscopeDataX[i - 1];
+            gyroscopeDataY[i] = gyroscopeDataY[i - 1];
+            gyroscopeDataZ[i] = gyroscopeDataZ[i - 1];
+            AccelerometerDataX[i] = AccelerometerDataX[i - 1];
+            AccelerometerDataY[i] = AccelerometerDataY[i - 1];
+            AccelerometerDataZ[i] = AccelerometerDataZ[i - 1];
+            }
+            //at the moment i save raw data 
+            gyroscopeDataX[0]= gyro_x; 
+            gyroscopeDataY[0]= gyro_y; 
+            gyroscopeDataZ[0]= gyro_z; 
+            AccelerometerDataX[0] = accel_x;
+            AccelerometerDataY[0] = accel_y;
+            AccelerometerDataZ[0] = accel_z;
+
 
 
             // Print raw data values
@@ -113,7 +138,7 @@ void analyze_main(){
             printf("Failed to read IMU's data\n");
         }
         //if we speed this up we will do more measurments per s
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // this way our EPS can do some other tasks 
+        vTaskDelay(250 / portTICK_PERIOD_MS); // 4 measurments every second
     }
 
     ESP_LOGI(TAG, "Main ending...");
