@@ -58,3 +58,4 @@ dkms.conf
 /.vscode/
 /cmake-build-configure/
 /cmake-build-debug-esp-idf/
+/CMakeFiles/

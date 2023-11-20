@@ -1,0 +1,1 @@
+cmd='/home/bert/.espressif/tools/cmake/3.24.0/bin/cmake;-DSDKCONFIG=/home/bert/Documents/EEH/HEE-FOG/sdkconfig;-DIDF_PATH=/home/bert/esp/esp-idf;-DIDF_TARGET=esp32;-DPYTHON_DEPS_CHECKED=1;-DPYTHON=python;-DEXTRA_COMPONENT_DIRS=/home/bert/esp/esp-idf/components/bootloader;-DPROJECT_SOURCE_DIR=/home/bert/Documents/EEH/HEE-FOG;-GUnix Makefiles;<SOURCE_DIR><SOURCE_SUBDIR>'
