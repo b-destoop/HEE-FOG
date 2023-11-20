@@ -57,7 +57,7 @@ void actuate_main() {
     while (1) {
         // ADC ONE-SHOT CODE
         ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC_CHAN, &adc_read));
-        ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC_CHAN, adc_read);
+        //ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC_CHAN, adc_read);
 
         // PWM CODE
         // the adc is 12 bit, the duty cycle res is 4 bit ==> bit shift the adc reading 8 bits to the right
