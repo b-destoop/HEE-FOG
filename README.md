@@ -21,7 +21,8 @@ An ESP32 microcontroller project for FOG episodes with Parkinson's patients.
 
 ## pinouts
 
-![pinout](https://cdn-learn.adafruit.com/assets/assets/000/111/179/original/wireless_Adafruit_HUZZAH32_ESP32_Feather_Pinout.png?1651089809)
+![pinout adafruit huzzah32](https://cdn-learn.adafruit.com/assets/assets/000/111/179/original/wireless_Adafruit_HUZZAH32_ESP32_Feather_Pinout.png?1651089809)
+![pinout esp32-devkitm-1](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/_images/ESP32_DevKitM-1_pinlayout.png)
 pin connections:
 
 | GPIO pin | function         |
