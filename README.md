@@ -18,7 +18,15 @@ An ESP32 microcontroller project for FOG episodes with Parkinson's patients.
 <!-- TOC -->
 
 ## pinouts
+
 ![pinout](https://cdn-learn.adafruit.com/assets/assets/000/111/179/original/wireless_Adafruit_HUZZAH32_ESP32_Feather_Pinout.png?1651089809)
+pin connections:
+
+| pin | function |
+|-----|----------|
+|     | **IMU**  |
+| 22  | SCL      |
+| 23  | SDA      |
 
 ## code strategy
 
@@ -103,6 +111,7 @@ sudo usermod -a -G dialout [username]
 ```
 
 ### LINUX - exit idf.py monitor
+
 [idf docs](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-monitor.html)
 try:
 ctrl + alt_gr + ]
