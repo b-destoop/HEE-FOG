@@ -52,9 +52,7 @@ Mkfile.old
 dkms.conf
 
 # own aditions
-/build/
-/cmake-build-debug/
+*build*
 /managed_components/
 /.vscode/
-/cmake-build-configure/
-/cmake-build-debug-esp-idf/
+/CMakeFiles/
