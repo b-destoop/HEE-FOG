@@ -5,20 +5,37 @@ An ESP32 microcontroller project for FOG episodes with Parkinson's patients.
 ## table of contents
 
 <!-- TOC -->
+
 * [HEE-FOG](#hee-fog)
-  * [table of contents](#table-of-contents)
-  * [pinouts](#pinouts)
-  * [code strategy](#code-strategy)
-  * [directory structure](#directory-structure)
-  * [more esp-idf info](#more-esp-idf-info)
-  * [Common problems](#common-problems)
-    * [WINDOWS - CLion setup tutorial on Windows (old GUI)](#windows---clion-setup-tutorial-on-windows-old-gui)
-    * [LINUX - TTY permission error](#linux---tty-permission-error)
-    * [LINUX - exit idf.py monitor](#linux---exit-idfpy-monitor)
+    * [table of contents](#table-of-contents)
+    * [pinouts](#pinouts)
+    * [code strategy](#code-strategy)
+    * [directory structure](#directory-structure)
+    * [more esp-idf info](#more-esp-idf-info)
+    * [Common problems](#common-problems)
+        * [WINDOWS - CLion setup tutorial on Windows (old GUI)](#windows---clion-setup-tutorial-on-windows-old-gui)
+        * [LINUX - TTY permission error](#linux---tty-permission-error)
+        * [LINUX - exit idf.py monitor](#linux---exit-idfpy-monitor)
+
 <!-- TOC -->
 
 ## pinouts
-![pinout](https://cdn-learn.adafruit.com/assets/assets/000/111/179/original/wireless_Adafruit_HUZZAH32_ESP32_Feather_Pinout.png?1651089809)
+
+![pinout adafruit huzzah32](https://cdn-learn.adafruit.com/assets/assets/000/111/179/original/wireless_Adafruit_HUZZAH32_ESP32_Feather_Pinout.png?1651089809)
+![pinout esp32-devkitm-1](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/_images/ESP32_DevKitM-1_pinlayout.png)
+pin connections:
+
+| GPIO pin | function         |
+|----------|------------------|
+|          | *IMU*            |
+| 22       | SCL              |
+| 23       | SDA              |
+|          | *ACTUATOR*       |
+| 36       | potentiometer in |
+| 5        | motor output     |
+| 25       | DAC out          |
+
+- Potentiometer is to control the amount of output voltage for the vibration motor
 
 ## code strategy
 
@@ -103,6 +120,7 @@ sudo usermod -a -G dialout [username]
 ```
 
 ### LINUX - exit idf.py monitor
+
 [idf docs](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-monitor.html)
 try:
 ctrl + alt_gr + ]
