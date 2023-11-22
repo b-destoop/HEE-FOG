@@ -33,6 +33,7 @@ pin connections:
 |          | *ACTUATOR*       |
 | 36       | potentiometer in |
 | 5        | motor output     |
+| 25       | DAC out          |
 
 - Potentiometer is to control the amount of output voltage for the vibration motor
 
