@@ -5,7 +5,8 @@
 
 #include "esp_log.h"
 #include "esp_log.h"
-
+//time_t MY_TIMESPEC;
+#define xTIME_OUT CLOCK_REALTIME
 // clock sample speed
 #define SAMPLE_PERIOD_MS		200
 // I2C configuration
@@ -17,9 +18,13 @@
 #define I2C_MASTER_FREQ_HZ 100000     /*!< I2C master clock frequency */
 #define MPU6050_ADDR 0x68 // AD0 connected to GND to give it the address
 #define PWR_MGMT_1 0x6B
+#define ARRAY_SIZE		64      //MUST BE power of 2 (e.g., 2, 4, 8, 16, 32,64,...)!!!! for fft 
+#define TimeBeweenMeasurements 500  //250ms between timing 
 
 #endif //HEE_FOG_ANALYZE_H
+ // get time
+#define MY_TIMESPEC struct timespec start_time, end_time
+//FFT stuff==============================================================
 
-
-
+//FFT stuff ================================================
 void analyze_main();  // Forward declaration
