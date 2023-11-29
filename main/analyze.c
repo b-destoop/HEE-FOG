@@ -1,10 +1,11 @@
-//“Difficult to see; always in motion is the future.” —Yoda, The Empire Strikes Back 
+//“Difficult to see; always in motion is the future.” —Yoda, The Empire Strikes Back
 
 #include <stdio.h>
 #include "esp_log.h"
 #include "driver/i2c.h"
 #include "analyze.h"
 #include "FFT.h"
+#include "bt.h"
 
 static const char *TAG = "analyze";
 
@@ -45,7 +46,7 @@ esp_err_t i2c_master_read_slave(uint8_t dev_addr, uint8_t reg_addr, uint8_t *dat
     return ret;
 }
 
-//aparentlly you need to wake the shitty thing up since it prefece to only steal my sleep and keep sleeping itself
+//apparently you need to wake the shitty thing up since it prefers to only steal my sleep and keep sleeping itself
 void wakeUpMPU6050() {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 
@@ -80,6 +81,8 @@ void analyze_main() {
         return;
     }
 
+    // MPU 6050 (IMU)
+
     wakeUpMPU6050();  // Wake up!!!
     uint8_t data[14]; // 14 bytes for 3 axes of accelerometer, 3 axes of gyroscope (we also got a temp sensor in there you know... xxx)
     float gyroscopeDataX[ARRAY_SIZE]; // array with gyro data of the X axis, initial list is filled with zero's
@@ -89,6 +92,11 @@ void analyze_main() {
     float AccelerometerDataY[ARRAY_SIZE]; // array with gyro data of the Y axis, initial list is filled with zero's
     float AccelerometerDataZ[ARRAY_SIZE]; // you get the point don't you?
     int itterator = 0;
+
+    // Bluetooth
+#ifdef USE_BT
+    bt_establish_connection();
+#endif
 
     while (1) {
 
@@ -118,8 +126,6 @@ void analyze_main() {
             AccelerometerDataX[0] = accel_x;
             AccelerometerDataY[0] = accel_y;
             AccelerometerDataZ[0] = accel_z;
-
-
 
             // Print raw data values
             //printf("Raw Data: X=, Y=%d, Z=%d\n", accel_x, accel_y, accel_z);
@@ -166,10 +172,6 @@ void analyze_main() {
         } else {
             printf("Failed to read IMU's data\n");
         }
-
-
     }
-
-
     ESP_LOGI(TAG, "Main ending...");
 }

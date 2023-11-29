@@ -20,6 +20,8 @@
 #define PWR_MGMT_1 0x6B
 #define TimeBeweenMeasurements 500  //250ms between timing
 
+#define USE_BT /*! undefine this to build faster */
+
 #endif //HEE_FOG_ANALYZE_H
  // get time
 #define MY_TIMESPEC struct timespec start_time, end_time

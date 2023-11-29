@@ -5,18 +5,17 @@ An ESP32 microcontroller project for FOG episodes with Parkinson's patients.
 ## table of contents
 
 <!-- TOC -->
-
 * [HEE-FOG](#hee-fog)
-    * [table of contents](#table-of-contents)
-    * [pinouts](#pinouts)
-    * [code strategy](#code-strategy)
-    * [directory structure](#directory-structure)
-    * [more esp-idf info](#more-esp-idf-info)
-    * [Common problems](#common-problems)
-        * [WINDOWS - CLion setup tutorial on Windows (old GUI)](#windows---clion-setup-tutorial-on-windows-old-gui)
-        * [LINUX - TTY permission error](#linux---tty-permission-error)
-        * [LINUX - exit idf.py monitor](#linux---exit-idfpy-monitor)
-
+  * [table of contents](#table-of-contents)
+  * [pinouts](#pinouts)
+  * [code strategy](#code-strategy)
+  * [directory structure](#directory-structure)
+  * [more esp-idf info](#more-esp-idf-info)
+  * [esp32 -- PC connection](#esp32----pc-connection)
+  * [Common problems](#common-problems)
+    * [WINDOWS - CLion setup tutorial on Windows (old GUI)](#windows---clion-setup-tutorial-on-windows-old-gui)
+    * [LINUX - TTY permission error](#linux---tty-permission-error)
+    * [LINUX - exit idf.py monitor](#linux---exit-idfpy-monitor)
 <!-- TOC -->
 
 ## pinouts
@@ -92,6 +91,15 @@ the same time" - more or less.
 - [build system](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html)
 - [components/component manager](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-component-manager.html)
 - [POSIX threads](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/pthread.html)
+
+## esp32 -- PC connection
+- wired connection
+  1. https://www.esp32.com/viewtopic.php?t=25578
+  2. https://linux.die.net/man/3/getc
+  3. https://www.baeldung.com/linux/stream-redirections
+- [tutorial on plotting data over wifi -- no PC programming needed](https://www.youtube.com/watch?v=UYeQoo-Z1vg)
+  - https://kst-plot.kde.org/
+- 
 
 ## Common problems
 
