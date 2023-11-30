@@ -17,8 +17,9 @@ from sys import platform
 # -- CONFIG --
 PORT = ""
 BAUD_RATE = 115200
-
 MS_BETWEEN_READS = 200
+PLOTTING_FRAMES_WDW = 20
+
 
 lines_queue = queue.Queue()
 
@@ -103,13 +104,13 @@ def draw_plot_for_data(axs, subplot_coord: (int, int), subplot_title: str, plot_
     global dataframe
 
     # Limit x and y lists to items
-    xs = dataframe.tail(60)["ts"]  # the last 60 rows
+    xs = dataframe.tail(PLOTTING_FRAMES_WDW)["ts"]  # the last PLOTTING_FRAMES_WDW rows
     xs = xs / 1000  # ms => s
 
     xyz_raw: plt.Axes = axs[subplot_coord[0]][subplot_coord[1]]
     xyz_raw.clear()
     for data_title in plot_contents:
-        xyz_raw.plot(xs, dataframe.tail(60)[data_title], label=data_title)
+        xyz_raw.plot(xs, dataframe.tail(PLOTTING_FRAMES_WDW)[data_title], label=data_title)
     xyz_raw.set_title(subplot_title)
     xyz_raw.legend(loc='upper left')
 
