@@ -32,7 +32,7 @@ def get_serial_data():
     # see: esp-idf/tools/idf_py_actions/serial_ext.py
 
     ser = serial.Serial(
-        port="/dev/ttyUSB0",
+        port="/dev/" + port.name or PORT,
         baudrate=baud,
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
@@ -60,6 +60,7 @@ def get_serial_data():
             buffer = buffer[0:-2]  # trim off the \r and \n at the end of each line
             # print(buffer)
             lines_queue.put(buffer)
+            print(lines_queue.qsize())
             buffer = ""
 
         time.sleep(MS_BETWEEN_READS / 1000)
@@ -84,7 +85,7 @@ def animate(i, axs):
     # Draw plots
     draw_plot_for_data(axs, (0, 0), 'raw XYZ accelerometer data', ["X_raw", "Y_raw", "Z_raw"])
     draw_plot_for_data(axs, (1, 0), 'adjusted XYZ accelerometer data', ["X_acc_der", "Y_acc_der", "Z_acc_der"])
-    draw_plot_for_data(axs, (1,1), 'gyro data', ["X_gyr_der", "Y_gyr_der", "Z_gyr_der"])
+    draw_plot_for_data(axs, (1, 1), 'gyro data', ["X_gyr_der", "Y_gyr_der", "Z_gyr_der"])
 
 
 def draw_plot_for_data(axs, subplot_coord: (int, int), subplot_title: str, plot_contents: list[str]):
