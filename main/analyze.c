@@ -136,7 +136,7 @@ void analyze_main() {
 
             // Print the values for fun
             printf("X_acc_der=%.2f; Y_acc_der=%.2f; Z_acc_der=%.2f; ", accel_x_g, accel_y_g, accel_z_g); //der = derived
-            printf("X_gyr_der=%.2f; YX_gyr_der=%.2f; ZX_gyr_der=%.2f; ", gyro_x_dps, gyro_y_dps, gyro_z_dps);
+            printf("X_gyr_der=%.2f; Y_gyr_der=%.2f; Z_gyr_der=%.2f; ", gyro_x_dps, gyro_y_dps, gyro_z_dps);
 
             itterator = itterator + 1;
             float listIM[ARRAY_SIZE] = {0};  // Initialize listIM with zeros
