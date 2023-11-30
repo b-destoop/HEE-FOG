@@ -10,6 +10,7 @@ import matplotlib.animation as animation
 import datetime as dt
 import queue
 import pandas as pd
+from sys import platform
 
 # serial info https://espressif-docs.readthedocs-hosted.com/projects/esp-idf/en/v3.3.5/get-started/establish-serial-connection.html
 # https://pyserial.readthedocs.io/en/latest/pyserial_api.html
@@ -23,6 +24,7 @@ lines_queue = queue.Queue()
 
 
 def get_serial_data():
+    port_name = PORT
     if PORT == "":
         for _port in serial.tools.list_ports.comports():
             if "UART Bridge Controller" in _port.description:
@@ -31,13 +33,21 @@ def get_serial_data():
     baud = os.getenv('IDF_MONITOR_BAUD') or os.getenv('MONITORBAUD') or BAUD_RATE
     # see: esp-idf/tools/idf_py_actions/serial_ext.py
 
+    if platform == "linux" or platform == "linux2":
+        port_name = "/dev/" + port.name or PORT
+    elif platform == "darwin":
+        pass
+        # OS X
+    elif platform == "win32":
+        port_name = port.name
+
     ser = serial.Serial(
-        port="/dev/" + port.name or PORT,
-        baudrate=baud,
-        parity=serial.PARITY_NONE,
-        stopbits=serial.STOPBITS_ONE,
-        bytesize=serial.EIGHTBITS,
-        timeout=0)
+            port=port_name,
+            baudrate=baud,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            bytesize=serial.EIGHTBITS,
+            timeout=0)
 
     print("connected to: " + ser.portstr)
 
