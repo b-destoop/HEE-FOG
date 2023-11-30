@@ -254,6 +254,7 @@ void analyze_main(){
                 }
                 printf("\n");
                 float sampleRate = 1000.0 / TimeBeweenMeasurements; // Convert to seconds
+                
                 float resonantFreq = findResonantFrequency(AccelerometerDataX, ARRAY_SIZE, sampleRate); 
                 printf("resonantfrequency= \n %f",resonantFreq);
                 printf("===================================================\n");
