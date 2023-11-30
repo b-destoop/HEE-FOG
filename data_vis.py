@@ -17,7 +17,7 @@ import pandas as pd
 PORT = ""
 BAUD_RATE = 115200
 
-MS_BETWEEN_READS = 10
+MS_BETWEEN_READS = 50
 
 lines_queue = queue.Queue()
 
@@ -79,11 +79,11 @@ def animate(i, ax):
 
     # pd.concat([dataframe, pd.DataFrame(df_dict, index=[0])])
     dataframe = pd.concat([dataframe, pd.DataFrame(df_dict, index=[0])], ignore_index=True)
-    print(dataframe)
+    # print(dataframe)
 
-    # Limit x and y lists to 20 items
-    xs = dataframe["ts"][-100:]
-    ys = dataframe["X_raw"][-100:]
+    # Limit x and y lists to items
+    xs = dataframe.tail(60)["ts"] # the last 60 rows
+    ys = dataframe.tail(60)["X_raw"]
 
     # Draw x and y lists
     ax.clear()
@@ -117,15 +117,13 @@ def handle_data():
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
 
-    dataframe = pd.DataFrame(serial_txt_to_dict(lines_queue.get()), index=[0])
-
     # Set up plot to call animate() function periodically
-    ani = animation.FuncAnimation(fig, animate, fargs=(ax,), interval=100)
+    # interval = 0 because blocking queue.get in animate function
+    ani = animation.FuncAnimation(fig, animate, fargs=(ax,), interval=0)
     plt.show()
 
     while True:
-        data = lines_queue.get()
-        print(data)
+        continue
 
 
 thread_serial = threading.Thread(target=get_serial_data, name="serial thread", daemon=True)

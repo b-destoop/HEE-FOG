@@ -163,7 +163,6 @@ void analyze_main() {
             printf("\n");
             //if we speed this up we will do more measurements per s
             vTaskDelay(MS_BETWEEN_MEASUREMENTS / portTICK_PERIOD_MS); // 4 measurements every second
-            //todo: fix problem with "stack overflow in task ANALYZE has been detected" ==> print stack size too
         } else {
             printf("Failed to read IMU's data\n");
         }
