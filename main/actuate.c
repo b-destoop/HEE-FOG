@@ -11,6 +11,7 @@
 #include "esp_log.h"
 #include "sdkconfig.h"
 #include "hal/ledc_types.h"
+#include "thread.h"
 
 
 // ADC DEFINES
@@ -47,6 +48,12 @@ void actuate_main() {
     ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, ADC_CHAN, &adc_config));
 
     while (1) {
+        // FREQUENCY DERIVATION
+        data_frame_t dataFrame;
+        get_df_from_q(&dataFrame);
+        ESP_LOGI(TAG, "dataframe - ts: %lu, freq: %f, cue: %i", dataFrame.df_timestamp, dataFrame.resonant_frequency,
+                 dataFrame.cue);
+
         // ADC CODE (one-shot mode)
         ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, ADC_CHAN, &adc_read));
         //ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC_CHAN, adc_read);
