@@ -1,16 +1,14 @@
 import os
+import queue
 import re
 import threading
 import time
-
-import pandas
-import serial.tools.list_ports
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import datetime as dt
-import queue
-import pandas as pd
 from sys import platform
+
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+import pandas as pd
+import serial.tools.list_ports
 
 # serial info https://espressif-docs.readthedocs-hosted.com/projects/esp-idf/en/v3.3.5/get-started/establish-serial-connection.html
 # https://pyserial.readthedocs.io/en/latest/pyserial_api.html
