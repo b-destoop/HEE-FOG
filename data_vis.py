@@ -18,7 +18,7 @@ from sys import platform
 PORT = ""
 BAUD_RATE = 115200
 
-MS_BETWEEN_READS = 50
+MS_BETWEEN_READS = 200
 
 lines_queue = queue.Queue()
 
@@ -70,8 +70,9 @@ def get_serial_data():
             buffer = buffer[0:-2]  # trim off the \r and \n at the end of each line
             # print(buffer)
             lines_queue.put(buffer)
-            print(lines_queue.qsize())
+            print(buffer)
             buffer = ""
+            ser.flushInput()
 
         time.sleep(MS_BETWEEN_READS / 1000)
 
@@ -135,7 +136,7 @@ def handle_data():
 
     # Set up plot to call animate() function periodically
     # interval = 0 because blocking queue.get in animate function
-    ani = animation.FuncAnimation(fig, animate, fargs=(axs,), interval=0)
+    ani = animation.FuncAnimation(fig, animate, fargs=(axs,), interval=1)
     plt.show()
 
     while True:
