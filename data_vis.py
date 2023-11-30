@@ -70,7 +70,7 @@ def get_serial_data():
 dataframe = pd.DataFrame([])
 
 
-def animate(i, ax):
+def animate(i, axs):
     global dataframe
     # Read all data from queue
     data_txt = lines_queue.get()
@@ -81,19 +81,25 @@ def animate(i, ax):
     dataframe = pd.concat([dataframe, pd.DataFrame(df_dict, index=[0])], ignore_index=True)
     # print(dataframe)
 
+    # Draw plots
+    draw_plot_for_data(axs, (0, 0), 'raw XYZ accelerometer data', ["X_raw", "Y_raw", "Z_raw"])
+    draw_plot_for_data(axs, (1, 0), 'adjusted XYZ accelerometer data', ["X_acc_der", "Y_acc_der", "Z_acc_der"])
+    draw_plot_for_data(axs, (1,1), 'gyro data', ["X_gyr_der", "Y_gyr_der", "Z_gyr_der"])
+
+
+def draw_plot_for_data(axs, subplot_coord: (int, int), subplot_title: str, plot_contents: list[str]):
+    global dataframe
+
     # Limit x and y lists to items
-    xs = dataframe.tail(60)["ts"] # the last 60 rows
-    ys = dataframe.tail(60)["X_raw"]
+    xs = dataframe.tail(60)["ts"]  # the last 60 rows
+    xs = xs / 1000  # ms => s
 
-    # Draw x and y lists
-    ax.clear()
-    ax.plot(xs, ys)
-
-    # Format plot
-    plt.xticks(rotation=45, ha='right')
-    plt.subplots_adjust(bottom=0.30)
-    plt.title('NOT TMP102 Temperature over Time')
-    plt.ylabel('NOT Temperature (deg C)')
+    xyz_raw: plt.Axes = axs[subplot_coord[0]][subplot_coord[1]]
+    xyz_raw.clear()
+    for data_title in plot_contents:
+        xyz_raw.plot(xs, dataframe.tail(60)[data_title], label=data_title)
+    xyz_raw.set_title(subplot_title)
+    xyz_raw.legend(loc='upper left')
 
 
 def serial_txt_to_dict(data_txt):
@@ -114,12 +120,11 @@ def serial_txt_to_dict(data_txt):
 
 
 def handle_data():
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
+    fig, axs = plt.subplots(2, 2)
 
     # Set up plot to call animate() function periodically
     # interval = 0 because blocking queue.get in animate function
-    ani = animation.FuncAnimation(fig, animate, fargs=(ax,), interval=0)
+    ani = animation.FuncAnimation(fig, animate, fargs=(axs,), interval=0)
     plt.show()
 
     while True:
