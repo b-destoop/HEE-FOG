@@ -18,7 +18,6 @@ BAUD_RATE = 115200
 MS_BETWEEN_READS = 200
 PLOTTING_FRAMES_WDW = 20
 
-
 lines_queue = queue.Queue()
 
 
@@ -41,12 +40,12 @@ def get_serial_data():
         port_name = port.name
 
     ser = serial.Serial(
-            port=port_name,
-            baudrate=baud,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.EIGHTBITS,
-            timeout=0)
+        port=port_name,
+        baudrate=baud,
+        parity=serial.PARITY_NONE,
+        stopbits=serial.STOPBITS_ONE,
+        bytesize=serial.EIGHTBITS,
+        timeout=0)
 
     print("connected to: " + ser.portstr)
 
@@ -67,7 +66,6 @@ def get_serial_data():
 
         if buffer[-1] == "\n":
             buffer = buffer[0:-2]  # trim off the \r and \n at the end of each line
-            # print(buffer)
             lines_queue.put(buffer)
             print(buffer)
             buffer = ""
@@ -78,39 +76,62 @@ def get_serial_data():
     ser.close()
 
 
-dataframe = pd.DataFrame([])
+def str_to_float_list(string: str):
+    string = string[1:-1]
+    list_str = string.split(",")
+    list_float = []
+    for word in list_str:
+        if word == ' ':
+            continue
+        list_float.append(float(word))
+    return list_float
 
 
 def animate(i, axs):
-    global dataframe
+    global dataframe_raw, dataframe_FFT
     # Read all data from queue
     data_txt = lines_queue.get()
-
     df_dict = serial_txt_to_dict(data_txt)
 
-    # pd.concat([dataframe, pd.DataFrame(df_dict, index=[0])])
-    dataframe = pd.concat([dataframe, pd.DataFrame(df_dict, index=[0])], ignore_index=True)
+    # Update the dataframe where data is stored
+    dataframe_in = pd.DataFrame(df_dict, index=[0])
+    dataframe_raw = pd.concat([dataframe_raw, dataframe_in], ignore_index=True, join="inner")
     # print(dataframe)
 
-    # Draw plots
-    draw_plot_for_data(axs, (0, 0), 'raw XYZ accelerometer data', ["X_raw", "Y_raw", "Z_raw"])
-    draw_plot_for_data(axs, (1, 0), 'adjusted XYZ accelerometer data', ["X_acc_der", "Y_acc_der", "Z_acc_der"])
-    draw_plot_for_data(axs, (1, 1), 'gyro data', ["X_gyr_der", "Y_gyr_der", "Z_gyr_der"])
+    if "FFT_array_in" in dataframe_in and "FFT_array_der" in dataframe_in:
+        dataframe_FFT = pd.concat(
+            [dataframe_FFT,
+             dataframe_in[["FFT_array_in", "FFT_array_der", "FFT_max_freq"]]
+             ]
+        )
+        fft_arr_in_latest_str = dataframe_FFT.tail(1)["FFT_array_in"][0]
+        fft_arr_in_latest = str_to_float_list(fft_arr_in_latest_str)
 
-
-def draw_plot_for_data(axs, subplot_coord: (int, int), subplot_title: str, plot_contents: list[str]):
-    global dataframe
+        ax: plt.Axes = axs[0][1]
+        ax.clear()
+        ax.set_title("FFT")
+        ax.bar(range(len(fft_arr_in_latest)), fft_arr_in_latest)
 
     # Limit x and y lists to items
-    xs = dataframe.tail(PLOTTING_FRAMES_WDW)["ts"]  # the last PLOTTING_FRAMES_WDW rows
+    xs = dataframe_raw.tail(PLOTTING_FRAMES_WDW)["ts"]  # the last PLOTTING_FRAMES_WDW rows
     xs = xs / 1000  # ms => s
 
-    xyz_raw: plt.Axes = axs[subplot_coord[0]][subplot_coord[1]]
-    xyz_raw.clear()
+    # Draw plots
+    draw_plot_for_data(axs, (0, 0), 'raw XYZ accelerometer data', xs, ["X_raw", "Y_raw", "Z_raw"])
+    draw_plot_for_data(axs, (1, 0), 'adjusted XYZ accelerometer data', xs,
+                       ["X_acc_der", "Y_acc_der", "Z_acc_der"])
+    draw_plot_for_data(axs, (1, 1), 'gyro data', xs, ["X_gyr_der", "Y_gyr_der", "Z_gyr_der"])
+
+
+def draw_plot_for_data(axs, subplot_coord: (int, int), subplot_title: str, x_contents, plot_contents: list[str]):
+    global dataframe_raw
+
+    ax: plt.Axes = axs[subplot_coord[0]][subplot_coord[1]]
+    ax.clear()
     for data_title in plot_contents:
-        xyz_raw.plot(xs, dataframe.tail(PLOTTING_FRAMES_WDW)[data_title], label=data_title)
-    xyz_raw.set_title(subplot_title)
-    xyz_raw.legend(loc='upper left')
+        ax.plot(x_contents, dataframe_raw.tail(PLOTTING_FRAMES_WDW)[data_title], label=data_title)
+    ax.set_title(subplot_title)
+    ax.legend(loc='upper left')
 
 
 def serial_txt_to_dict(data_txt):
@@ -121,7 +142,7 @@ def serial_txt_to_dict(data_txt):
     for match in matches:
         variable_name, value = match
         try:
-            df_dict[variable_name] = float(value) if '[' not in value else print(value)
+            df_dict[variable_name] = float(value) if '[' not in value else value
         except ValueError as e:
             print(e)
             df_dict[variable_name] = 0
@@ -144,5 +165,9 @@ def handle_data():
 
 thread_serial = threading.Thread(target=get_serial_data, name="serial thread", daemon=True)
 thread_serial.start()
+
+dataframe_raw = pd.DataFrame(serial_txt_to_dict(lines_queue.get()), index=[0])
+dataframe_FFT = pd.DataFrame([])
 handle_data()
+
 thread_serial.join()
