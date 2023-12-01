@@ -45,7 +45,7 @@ def get_serial_data():
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
-        timeout=0)
+        timeout=1)  # return after 1 seconds when no byte is received
 
     print("connected to: " + ser.portstr)
 
@@ -67,13 +67,38 @@ def get_serial_data():
         if buffer[-1] == "\n":
             buffer = buffer[0:-2]  # trim off the \r and \n at the end of each line
             lines_queue.put(buffer)
-            print(buffer)
+            print(ser.inWaiting(), end="\t")
+            print(lines_queue.qsize())
             buffer = ""
-            ser.flushInput()
 
-        time.sleep(MS_BETWEEN_READS / 1000)
+        # time.sleep(MS_BETWEEN_READS / 1000)
 
     ser.close()
+
+
+def update_dataframe():
+    global dataframe_raw, dataframe_FFT
+    while True:
+        # Read all data from queue
+        data_txt = lines_queue.get()
+        df_dict = serial_txt_to_dict(data_txt)
+
+        # Update the dataframe where data is stored
+        dataframe_in = pd.DataFrame(df_dict, index=[0])
+
+        df_raw_lock.acquire()
+        dataframe_raw = pd.concat([dataframe_raw, dataframe_in], ignore_index=True, join="inner")
+        df_raw_lock.release()
+
+        # print(dataframe)
+        if "FFT_array_in" in dataframe_in and "FFT_array_der" in dataframe_in:
+            df_FFT_lock.acquire()
+            dataframe_FFT = pd.concat(
+                [dataframe_FFT,
+                 dataframe_in[["FFT_array_in", "FFT_array_der", "FFT_max_freq"]]
+                 ]
+            )
+            df_FFT_lock.release()
 
 
 def str_to_float_list(string: str):
@@ -88,23 +113,10 @@ def str_to_float_list(string: str):
 
 
 def animate(i, axs):
-    global dataframe_raw, dataframe_FFT
-    # Read all data from queue
-    data_txt = lines_queue.get()
-    df_dict = serial_txt_to_dict(data_txt)
-
-    # Update the dataframe where data is stored
-    dataframe_in = pd.DataFrame(df_dict, index=[0])
-    dataframe_raw = pd.concat([dataframe_raw, dataframe_in], ignore_index=True, join="inner")
-    # print(dataframe)
-
-    if "FFT_array_in" in dataframe_in and "FFT_array_der" in dataframe_in:
-        dataframe_FFT = pd.concat(
-            [dataframe_FFT,
-             dataframe_in[["FFT_array_in", "FFT_array_der", "FFT_max_freq"]]
-             ]
-        )
+    df_FFT_lock.acquire()
+    if "FFT_array_in" in dataframe_FFT and "FFT_array_der" in dataframe_FFT:
         fft_arr_in_latest_str = dataframe_FFT.tail(1)["FFT_array_in"][0]
+        df_FFT_lock.release()
         fft_arr_in_latest = str_to_float_list(fft_arr_in_latest_str)
 
         ax: plt.Axes = axs[0][1]
@@ -112,9 +124,14 @@ def animate(i, axs):
         ax.set_title("FFT")
         ax.bar(range(len(fft_arr_in_latest)), fft_arr_in_latest)
 
+    if df_FFT_lock.locked():
+        df_FFT_lock.release()
+
     # Limit x and y lists to items
+    df_raw_lock.acquire()
     xs = dataframe_raw.tail(PLOTTING_FRAMES_WDW)["ts"]  # the last PLOTTING_FRAMES_WDW rows
     xs = xs / 1000  # ms => s
+    df_raw_lock.release()
 
     # Draw plots
     draw_plot_for_data(axs, (0, 0), 'raw XYZ accelerometer data', xs, ["X_raw", "Y_raw", "Z_raw"])
@@ -128,8 +145,10 @@ def draw_plot_for_data(axs, subplot_coord: (int, int), subplot_title: str, x_con
 
     ax: plt.Axes = axs[subplot_coord[0]][subplot_coord[1]]
     ax.clear()
+    df_raw_lock.acquire()
     for data_title in plot_contents:
         ax.plot(x_contents, dataframe_raw.tail(PLOTTING_FRAMES_WDW)[data_title], label=data_title)
+    df_raw_lock.release()
     ax.set_title(subplot_title)
     ax.legend(loc='upper left')
 
@@ -151,23 +170,30 @@ def serial_txt_to_dict(data_txt):
     return df_dict
 
 
-def handle_data():
-    fig, axs = plt.subplots(2, 2)
-
-    # Set up plot to call animate() function periodically
-    # interval = 0 because blocking queue.get in animate function
-    ani = animation.FuncAnimation(fig, animate, fargs=(axs,), interval=1)
-    plt.show()
-
-    while True:
-        continue
-
+# FETCH DATA
+df_raw_lock = threading.Lock()
+df_FFT_lock = threading.Lock()
 
 thread_serial = threading.Thread(target=get_serial_data, name="serial thread", daemon=True)
 thread_serial.start()
 
 dataframe_raw = pd.DataFrame(serial_txt_to_dict(lines_queue.get()), index=[0])
 dataframe_FFT = pd.DataFrame([])
-handle_data()
+
+thread_update_df = threading.Thread(target=update_dataframe, name="df thread")
+thread_update_df.start()
+
+# DO ANIMATION
+
+fig, axs = plt.subplots(2, 2)
+
+# Set up plot to call animate() function periodically
+# interval = 0 because blocking queue.get in animate function
+ani = animation.FuncAnimation(fig, animate, fargs=(axs,), interval=1)
+plt.show()
+
+while True:
+    continue
 
 thread_serial.join()
+thread_update_df.join()
