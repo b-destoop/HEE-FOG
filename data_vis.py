@@ -2,7 +2,6 @@ import os
 import queue
 import re
 import threading
-import time
 from sys import platform
 
 import matplotlib.animation as animation
@@ -16,7 +15,7 @@ import serial.tools.list_ports
 PORT = ""
 BAUD_RATE = 115200
 MS_BETWEEN_READS = 200
-PLOTTING_FRAMES_WDW = 20
+PLOTTING_FRAMES_WDW = 100
 
 lines_queue = queue.Queue()
 
@@ -135,9 +134,7 @@ def animate(i, axs):
 
     # Draw plots
     draw_plot_for_data(axs, (0, 0), 'raw XYZ accelerometer data', xs, ["X_raw", "Y_raw", "Z_raw"])
-    draw_plot_for_data(axs, (1, 0), 'adjusted XYZ accelerometer data', xs,
-                       ["X_acc_der", "Y_acc_der", "Z_acc_der"])
-    draw_plot_for_data(axs, (1, 1), 'gyro data', xs, ["X_gyr_der", "Y_gyr_der", "Z_gyr_der"])
+    draw_plot_for_data(axs, (1, 0), 'gyro data', xs, ["X_gyr_der", "Y_gyr_der", "Z_gyr_der"])
 
 
 def draw_plot_for_data(axs, subplot_coord: (int, int), subplot_title: str, x_contents, plot_contents: list[str]):
@@ -189,7 +186,7 @@ fig, axs = plt.subplots(2, 2)
 
 # Set up plot to call animate() function periodically
 # interval = 0 because blocking queue.get in animate function
-ani = animation.FuncAnimation(fig, animate, fargs=(axs,), interval=1)
+ani = animation.FuncAnimation(fig, animate, fargs=(axs,), interval=20)
 plt.show()
 
 while True:
