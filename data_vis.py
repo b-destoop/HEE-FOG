@@ -51,16 +51,18 @@ def get_serial_data():
 
     print("connected to: " + ser.portstr)
 
-    buffer = ""
-
     while True:
-        bytes = ser.readline()
-        bytes = bytes.decode("utf-8")
+        buffer = ""
+        while True:
+            byte_rec = ser.read()
+            char = byte_rec.decode("utf-8")
+            buffer += char
+            if char == "\n":
+                break
 
-        if bytes == "":
+        if buffer == "":
             continue
 
-        buffer += bytes
 
         if buffer[0:2] != "ts":
             buffer = ""
@@ -68,7 +70,12 @@ def get_serial_data():
 
         if buffer[-1] == "\n":
             buffer = buffer[0:-2]  # trim off the \r and \n at the end of each line
-            lines_queue.put(buffer)
+            pattern = re.compile(r"ts=.+; X_raw=.+; Y_raw=.+; Z_raw=.+; X_acc_der=.+; Y_acc_der=.+; Z_acc_der=.+; "
+                                 r"X_gyr_der=.+; Y_gyr_der=.+; Z_gyr_der=.+")
+            if pattern.search(buffer):
+                lines_queue.put(buffer)
+            else:
+                print(buffer)
             print(ser.inWaiting(), end="\t")
             print(lines_queue.qsize())
             buffer = ""
