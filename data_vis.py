@@ -36,8 +36,8 @@ def get_serial_data():
     if platform == "linux" or platform == "linux2":
         port_name = "/dev/" + port.name or PORT
     elif platform == "darwin":
-        pass
         # OS X
+        pass
     elif platform == "win32":
         port_name = port.name
 
