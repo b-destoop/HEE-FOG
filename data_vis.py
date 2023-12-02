@@ -18,7 +18,7 @@ PORT = ""
 BAUD_RATE = 115200
 MS_BETWEEN_READS = 200
 PLOTTING_FRAMES_TIME_WDW = 100
-PLOTTING_FFT_TIME_WDW_MS = 3000 # making this too low results in all samples being used for the calculation
+PLOTTING_FFT_TIME_WDW_MS = 3000  # making this too low results in all samples being used for the calculation
 
 lines_queue = queue.Queue()
 
@@ -64,7 +64,6 @@ def get_serial_data():
             continue
 
         if buffer[0:2] != "ts":
-            buffer = ""
             continue
 
         if buffer[-1] == "\n":
@@ -77,9 +76,6 @@ def get_serial_data():
                 print(buffer)
             print(ser.inWaiting(), end="\t")
             print(lines_queue.qsize())
-            buffer = ""
-
-        # time.sleep(MS_BETWEEN_READS / 1000)
 
     ser.close()
 
