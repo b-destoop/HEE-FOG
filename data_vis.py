@@ -63,7 +63,6 @@ def get_serial_data():
         if buffer == "":
             continue
 
-
         if buffer[0:2] != "ts":
             buffer = ""
             continue
@@ -106,7 +105,7 @@ def update_dataframe():
         df_raw_lock.release()
 
         # print(dataframe)
-        if "FFT_array_in" in dataframe_in and "FFT_array_der" in dataframe_in and "FFT_max_freq" in dataframe_in :
+        if "FFT_array_in" in dataframe_in and "FFT_array_der" in dataframe_in and "FFT_max_freq" in dataframe_in:
             df_FFT_lock.acquire()
             dataframe_FFT = pd.concat(
                 [dataframe_FFT,
@@ -177,14 +176,14 @@ def animate(i, axs):
     fft_y = fft.rfft(y_raw_cut)
     fft_z = fft.rfft(z_raw_cut)
 
-    fft_x_freq = fft.fftfreq(fft_x.shape[-1], d=avg_ms_measure)
-    fft_y_freq = fft.fftfreq(fft_y.shape[-1], d=avg_ms_measure)
-    fft_z_freq = fft.fftfreq(fft_z.shape[-1], d=avg_ms_measure)
+    fft_x_freq = fft.rfftfreq(fft_x.size, d=avg_ms_measure/1000) # make the numbers on the axis in terms of freq = 1/s
+    fft_y_freq = fft.rfftfreq(fft_y.size, d=avg_ms_measure/1000)
+    fft_z_freq = fft.rfftfreq(fft_z.size, d=avg_ms_measure/1000)
 
     # plot the 3 FFTs on top of each other with some translucency
     ax: plt.Axes = axs[1][1]
     ax.clear()
-    ax.stem(fft_x_freq, np.absolute(fft_x))
+    ax.plot(fft_x_freq, np.absolute(fft_x)[:len(fft_x_freq)])
 
     # todo: plot the average FFT
 
