@@ -18,7 +18,7 @@ PORT = ""
 BAUD_RATE = 115200
 MS_BETWEEN_READS = 200
 PLOTTING_FRAMES_TIME_WDW = 100
-PLOTTING_FFT_TIME_WDW_MS = 3
+PLOTTING_FFT_TIME_WDW_MS = 3000 # making this too low results in all samples being used for the calculation
 
 lines_queue = queue.Queue()
 
@@ -176,14 +176,20 @@ def animate(i, axs):
     fft_y = fft.rfft(y_raw_cut)
     fft_z = fft.rfft(z_raw_cut)
 
-    fft_x_freq = fft.rfftfreq(fft_x.size, d=avg_ms_measure/1000) # make the numbers on the axis in terms of freq = 1/s
-    fft_y_freq = fft.rfftfreq(fft_y.size, d=avg_ms_measure/1000)
-    fft_z_freq = fft.rfftfreq(fft_z.size, d=avg_ms_measure/1000)
+    fft_x_freq = fft.rfftfreq(fft_x.size,
+                              d=avg_ms_measure / 1000)  # make the numbers on the axis in terms of freq = 1/s
+    fft_y_freq = fft.rfftfreq(fft_y.size, d=avg_ms_measure / 1000)
+    fft_z_freq = fft.rfftfreq(fft_z.size, d=avg_ms_measure / 1000)
 
     # plot the 3 FFTs on top of each other with some translucency
     ax: plt.Axes = axs[1][1]
     ax.clear()
-    ax.plot(fft_x_freq, np.absolute(fft_x)[:len(fft_x_freq)])
+    transparency = 0.75
+    ax.plot(fft_x_freq, np.absolute(fft_x)[:len(fft_x_freq)], label="fft x", alpha=transparency)
+    ax.plot(fft_y_freq, np.absolute(fft_x)[:len(fft_y_freq)], label="fft y", alpha=transparency)
+    ax.plot(fft_z_freq, np.absolute(fft_x)[:len(fft_z_freq)], label="fft z", alpha=transparency)
+    ax.set_title("FFT on pc")
+    ax.legend(loc="upper left")
 
     # todo: plot the average FFT
 
