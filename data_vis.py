@@ -136,6 +136,11 @@ def animate(i, axs):
 
     # FFT PLOT
     # draw plot from esp32 fft
+    plot_fft_received_esp32(axs)
+    plot_fft_from_raw(axs)
+
+
+def plot_fft_received_esp32(axs):
     df_FFT_lock.acquire()
     if "FFT_array_in" in dataframe_FFT and "FFT_array_der" in dataframe_FFT:
         fft_arr_in_latest_str = dataframe_FFT.tail(1)["FFT_array_in"][0]
@@ -149,7 +154,8 @@ def animate(i, axs):
     if df_FFT_lock.locked():
         df_FFT_lock.release()
 
-    # draw plot from numpy fft
+
+def plot_fft_from_raw(axs):
     # get the X_raw, Y_raw and Z_raw, ts data
     df_raw_lock.acquire()
     x_raw = dataframe_raw["X_raw"]
@@ -157,26 +163,21 @@ def animate(i, axs):
     z_raw = dataframe_raw["Z_raw"]
     ts = dataframe_raw["ts"]
     df_raw_lock.release()
-
     # get average delta_ms for fft adjustment (from ts)
     avg_ms_measure = int(ts.tail(1000).diff().mean())  # limit to 1000 to ensure speed
     print("avg time: " + str(avg_ms_measure))
-
     # cut the PLOTTING_FFT_TIME_WDW_MS amount of samples from X_raw, Y_raw and Z_raw, ts
     x_raw_cut = x_raw[-int(PLOTTING_FFT_TIME_WDW_MS / avg_ms_measure):]
     y_raw_cut = y_raw[-int(PLOTTING_FFT_TIME_WDW_MS / avg_ms_measure):]
     z_raw_cut = z_raw[-int(PLOTTING_FFT_TIME_WDW_MS / avg_ms_measure):]
-
     # do the FFT on each of the previous collections (and return real frequencies)
     fft_x = fft.rfft(x_raw_cut)
     fft_y = fft.rfft(y_raw_cut)
     fft_z = fft.rfft(z_raw_cut)
-
     fft_x_freq = fft.rfftfreq(fft_x.size,
                               d=avg_ms_measure / 1000)  # make the numbers on the axis in terms of freq = 1/s
     fft_y_freq = fft.rfftfreq(fft_y.size, d=avg_ms_measure / 1000)
     fft_z_freq = fft.rfftfreq(fft_z.size, d=avg_ms_measure / 1000)
-
     # plot the 3 FFTs on top of each other with some translucency
     ax: plt.Axes = axs[1][1]
     ax.clear()
@@ -186,7 +187,6 @@ def animate(i, axs):
     ax.plot(fft_z_freq, np.absolute(fft_x)[:len(fft_z_freq)], label="fft z", alpha=transparency)
     ax.set_title("FFT on pc")
     ax.legend(loc="upper left")
-
     # todo: plot the average FFT
 
 
