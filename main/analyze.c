@@ -5,6 +5,7 @@
 #include "driver/i2c.h"
 #include "analyze.h"
 #include "FFT.h"
+#include "thread.h"
 
 static const char *TAG = "analyze";
 
@@ -158,6 +159,11 @@ void analyze_main() {
                 float sampleRate = 1000.0 / MS_BETWEEN_MEASUREMENTS; // Convert to seconds
                 float resonantFreq = findResonantFrequency(AccelerometerDataX, ARRAY_SIZE, sampleRate);
                 printf("FFT_max_freq=%f; ", resonantFreq);
+                data_frame_t output;
+                output.df_timestamp = esp_log_timestamp();
+                output.resonant_frequency = resonantFreq;
+                output.cue = False;
+                put_df_in_q(output);
             }
 
             printf("\n");

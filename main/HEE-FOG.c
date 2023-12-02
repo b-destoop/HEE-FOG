@@ -17,6 +17,7 @@
 
 #include "analyze.h"
 #include "actuate.h"
+#include "thread.h"
 
 
 /* Use project configuration menu (idf.py menuconfig) to choose the GPIO to blink,
@@ -34,6 +35,9 @@ void app_main(void) {
 
     // create the 2 tasks
     TaskHandle_t analyze_task_handle, actuate_task_handle = NULL;
+
+    // initialize the threading
+    thread_initialize();
 
     // Create the task, storing the handle.  Note that the passed parameter ucParameterToPass
     // must exist for the lifetime of the task, so in this case is declared static.  If it was just an

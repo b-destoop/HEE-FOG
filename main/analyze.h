@@ -18,7 +18,7 @@
 #define I2C_MASTER_FREQ_HZ 100000     /*!< I2C master clock frequency */
 #define MPU6050_ADDR 0x68 // AD0 connected to GND to give it the address
 #define PWR_MGMT_1 0x6B
-#define MS_BETWEEN_MEASUREMENTS 100  //250ms between timing
+#define MS_BETWEEN_MEASUREMENTS 50  //250ms between timing
 
 #endif //HEE_FOG_ANALYZE_H
  // get time
