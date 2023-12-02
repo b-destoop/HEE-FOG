@@ -12,6 +12,10 @@
 #include "sdkconfig.h"
 #include "hal/ledc_types.h"
 #include "thread.h"
+#include <stdio.h>
+#include <time.h>
+#include <math.h>
+#include <stdint.h>
 
 
 // ADC DEFINES
@@ -22,6 +26,11 @@ static const char *TAG = "ACTUATE";
 
 void actuate_main() {
     ESP_LOGI(TAG, "Main started");
+    //-------------SIN Init---------------//
+    uint8_t LED_output;
+    clock_t startTime = clock(); // reset this value to restart sin on beat.
+    const double amplitude = 5.0;
+    double frequency = 1.0;  // Adjust as needed
     //-------------DAC Init---------------//
     dac_oneshot_handle_t dac_chan_handle;
     dac_oneshot_config_t dac_chan_cfg = {
@@ -57,6 +66,15 @@ void actuate_main() {
         // ADC CODE (one-shot mode)
         ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, ADC_CHAN, &adc_read));
         //ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC_CHAN, adc_read);
+        // SIN WAVE CODE
+        //---calculate time from start beat.
+        clock_t currentTime= clock();
+        double timeInSeconds = (double)(currentTime -startTime )/ CLOCKS_PER_SEC;
+        //---calculates sin at current time
+        double rawSample = amplitude * sin(2.0 * M_PI* frequency * timeInSeconds);
+        printf("%.2f\n", rawSample);
+        //---Map the rawSample from the range [-amplitude, amplitude] to [0, UINT8_MAX] (UINT8 are positive integers)
+        LED_output = (uint8_t)((rawSample + amplitude) * UINT8_MAX / (2.0 * amplitude));
 
         // DAC CODE
         dac_val = adc_read >> 4;
