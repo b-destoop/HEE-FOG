@@ -8,6 +8,8 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import pandas as pd
 import serial.tools.list_ports
+import numpy.fft as fft
+import numpy as np
 
 # serial info https://espressif-docs.readthedocs-hosted.com/projects/esp-idf/en/v3.3.5/get-started/establish-serial-connection.html
 # https://pyserial.readthedocs.io/en/latest/pyserial_api.html
@@ -15,7 +17,8 @@ import serial.tools.list_ports
 PORT = ""
 BAUD_RATE = 115200
 MS_BETWEEN_READS = 200
-PLOTTING_FRAMES_WDW = 100
+PLOTTING_FRAMES_TIME_WDW = 100
+PLOTTING_FFT_TIME_WDW_MS = 3
 
 lines_queue = queue.Queue()
 
@@ -87,10 +90,16 @@ def update_dataframe():
 
         df_raw_lock.acquire()
         dataframe_raw = pd.concat([dataframe_raw, dataframe_in], ignore_index=True, join="inner")
+        # assert("X_raw" in dataframe_raw)
+        # assert("Y_raw" in dataframe_raw)
+        # assert("Z_raw" in dataframe_raw)
+        # assert("X_gyr_der" in dataframe_raw)
+        # assert("Y_gyr_der" in dataframe_raw)
+        # assert("Z_gyr_der" in dataframe_raw)
         df_raw_lock.release()
 
         # print(dataframe)
-        if "FFT_array_in" in dataframe_in and "FFT_array_der" in dataframe_in:
+        if "FFT_array_in" in dataframe_in and "FFT_array_der" in dataframe_in and "FFT_max_freq" in dataframe_in :
             df_FFT_lock.acquire()
             dataframe_FFT = pd.concat(
                 [dataframe_FFT,
@@ -112,29 +121,65 @@ def str_to_float_list(string: str):
 
 
 def animate(i, axs):
+    # PLOT IMU DATA
+    # Limit x and y lists to items
+    df_raw_lock.acquire()
+    xs = dataframe_raw.tail(PLOTTING_FRAMES_TIME_WDW)["ts"]  # the last PLOTTING_FRAMES_WDW rows
+    xs = xs / 1000  # ms => s
+
+    # Draw plots
+    draw_plot_for_data(axs, (0, 0), 'raw XYZ accelerometer data', xs, ["X_raw", "Y_raw", "Z_raw"])
+    draw_plot_for_data(axs, (1, 0), 'gyro data', xs, ["X_gyr_der", "Y_gyr_der", "Z_gyr_der"])
+    df_raw_lock.release()
+
+    # FFT PLOT
+    # draw plot from esp32 fft
     df_FFT_lock.acquire()
     if "FFT_array_in" in dataframe_FFT and "FFT_array_der" in dataframe_FFT:
         fft_arr_in_latest_str = dataframe_FFT.tail(1)["FFT_array_in"][0]
         df_FFT_lock.release()
         fft_arr_in_latest = str_to_float_list(fft_arr_in_latest_str)
 
-        ax: plt.Axes = axs[0][1]
+        ax = axs[0][1]
         ax.clear()
-        ax.set_title("FFT")
+        ax.set_title("ESP32 FFT")
         ax.bar(range(len(fft_arr_in_latest)), fft_arr_in_latest)
-
     if df_FFT_lock.locked():
         df_FFT_lock.release()
 
-    # Limit x and y lists to items
+    # draw plot from numpy fft
+    # get the X_raw, Y_raw and Z_raw, ts data
     df_raw_lock.acquire()
-    xs = dataframe_raw.tail(PLOTTING_FRAMES_WDW)["ts"]  # the last PLOTTING_FRAMES_WDW rows
-    xs = xs / 1000  # ms => s
+    x_raw = dataframe_raw["X_raw"]
+    y_raw = dataframe_raw["Y_raw"]
+    z_raw = dataframe_raw["Z_raw"]
+    ts = dataframe_raw["ts"]
     df_raw_lock.release()
 
-    # Draw plots
-    draw_plot_for_data(axs, (0, 0), 'raw XYZ accelerometer data', xs, ["X_raw", "Y_raw", "Z_raw"])
-    draw_plot_for_data(axs, (1, 0), 'gyro data', xs, ["X_gyr_der", "Y_gyr_der", "Z_gyr_der"])
+    # get average delta_ms for fft adjustment (from ts)
+    avg_ms_measure = int(ts.tail(1000).diff().mean())  # limit to 1000 to ensure speed
+    print("avg time: " + str(avg_ms_measure))
+
+    # cut the PLOTTING_FFT_TIME_WDW_MS amount of samples from X_raw, Y_raw and Z_raw, ts
+    x_raw_cut = x_raw[-int(PLOTTING_FFT_TIME_WDW_MS / avg_ms_measure):]
+    y_raw_cut = y_raw[-int(PLOTTING_FFT_TIME_WDW_MS / avg_ms_measure):]
+    z_raw_cut = z_raw[-int(PLOTTING_FFT_TIME_WDW_MS / avg_ms_measure):]
+
+    # do the FFT on each of the previous collections (and return real frequencies)
+    fft_x = fft.rfft(x_raw_cut)
+    fft_y = fft.rfft(y_raw_cut)
+    fft_z = fft.rfft(z_raw_cut)
+
+    fft_x_freq = fft.fftfreq(fft_x.shape[-1], d=avg_ms_measure)
+    fft_y_freq = fft.fftfreq(fft_y.shape[-1], d=avg_ms_measure)
+    fft_z_freq = fft.fftfreq(fft_z.shape[-1], d=avg_ms_measure)
+
+    # plot the 3 FFTs on top of each other with some translucency
+    ax: plt.Axes = axs[1][1]
+    ax.clear()
+    ax.stem(fft_x_freq, np.absolute(fft_x))
+
+    # todo: plot the average FFT
 
 
 def draw_plot_for_data(axs, subplot_coord: (int, int), subplot_title: str, x_contents, plot_contents: list[str]):
@@ -142,10 +187,8 @@ def draw_plot_for_data(axs, subplot_coord: (int, int), subplot_title: str, x_con
 
     ax: plt.Axes = axs[subplot_coord[0]][subplot_coord[1]]
     ax.clear()
-    df_raw_lock.acquire()
     for data_title in plot_contents:
-        ax.plot(x_contents, dataframe_raw.tail(PLOTTING_FRAMES_WDW)[data_title], label=data_title)
-    df_raw_lock.release()
+        ax.plot(x_contents, dataframe_raw.tail(PLOTTING_FRAMES_TIME_WDW)[data_title], label=data_title)
     ax.set_title(subplot_title)
     ax.legend(loc='upper left')
 
