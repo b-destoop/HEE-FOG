@@ -4,9 +4,11 @@
 
 #include "FFT.h"
 
-#include <math.h>
+#include "kiss_fft130\kiss_fft.h" 
+//#include <math.h>
 
 void fft(float data_re[], const unsigned int N) {
+    //kiss_fft_cfg cfg = kiss_fft_alloc(N, 0, 0, 0);
     float dataIM[ARRAY_SIZE] = {0.0};
     rearrange(data_re, dataIM, N);
     compute(data_re, dataIM, N);
