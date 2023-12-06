@@ -4,11 +4,11 @@
 
 #include "FFT.h"
 
-#include "kiss_fft130/kiss_fft.h"
+#include "kiss_fft130/kiss_fft.h" 
 //#include <math.h>
-#define MS_BETWEEN_MEASUREMENTS 50  //here for testing will put it in .h later
 
-void fft(float data_re[], const int N) {
+
+float fft(float data_re[], const int N) {
     kiss_fft_cfg cfg = kiss_fft_alloc(N, 0, 0, 0);
 
     kiss_fft_cpx accelData[N];
@@ -39,8 +39,7 @@ void fft(float data_re[], const int N) {
     }
 
     kiss_fft_free(cfg);
-    //return frequency;
-
+    return maxFrequency;
 }
 
 void rearrange(float data_re[], float data_im[], const unsigned int N) {

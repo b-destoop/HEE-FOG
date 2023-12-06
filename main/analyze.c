@@ -1,4 +1,5 @@
 //“Difficult to see; always in motion is the future.” —Yoda, The Empire Strikes Back 
+//analyze.c
 
 #include <stdio.h>
 #include "esp_log.h"
@@ -150,14 +151,15 @@ void analyze_main() {
                 }
                 printf("]; ");
 
-                fft(AccelerometerDataX, ARRAY_SIZE);
+                //fft(AccelerometerDataX, ARRAY_SIZE);
                 printf("FFT_array_der=[");
                 for (unsigned int i = 0; i < ARRAY_SIZE; i++) {
                     printf("%f, ", AccelerometerDataX[i]);
                 }
                 printf("]; ");
-                float sampleRate = 1000.0 / MS_BETWEEN_MEASUREMENTS; // Convert to seconds
-                float resonantFreq = findResonantFrequency(AccelerometerDataX, ARRAY_SIZE, sampleRate);
+                //float sampleRate = 1000.0 / MS_BETWEEN_MEASUREMENTS; // Convert to seconds
+                float resonantFreq = fft(AccelerometerDataX, ARRAY_SIZE);
+                //float resonantFreq = findResonantFrequency(AccelerometerDataX, ARRAY_SIZE, sampleRate);
                 printf("FFT_max_freq=%f; ", resonantFreq);
                 data_frame_t output;
                 output.df_timestamp = esp_log_timestamp();
