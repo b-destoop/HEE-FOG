@@ -6,12 +6,41 @@
 
 #include "kiss_fft130\kiss_fft.h" 
 //#include <math.h>
+#define MS_BETWEEN_MEASUREMENTS 50  //here for testing will put it in .h later
 
 void fft(float data_re[], const unsigned int N) {
-    //kiss_fft_cfg cfg = kiss_fft_alloc(N, 0, 0, 0);
-    float dataIM[ARRAY_SIZE] = {0.0};
-    rearrange(data_re, dataIM, N);
-    compute(data_re, dataIM, N);
+    kiss_fft_cfg cfg = kiss_fft_alloc(N, 0, 0, 0);
+
+    kiss_fft_cpx accelData[N];
+    for (unsigned int i = 0; i < N; ++i) {
+        accelData[i].r = data_re[i];
+        accelData[i].i = 0.0;  // Assuming imaginary part is initially 0
+    }
+
+    kiss_fft_cpx fft_output[N];
+    kiss_fft(cfg, accelData, fft_output);
+    
+    float maxFrequency = 0.0;
+    float maxAmplitude = 0.0;
+    float lowerCutoff = 1;
+    float upperCutoff = 3;
+
+    for (unsigned int i = 0; i < N; ++i) {
+        // Calculate the frequency associated with each FFT bin
+        float sampleRate = 1000.0 / MS_BETWEEN_MEASUREMENTS; // Convert to seconds
+        float frequency = i * sampleRate / N;
+        float magnitude = sqrt(fft_output[i].r * fft_output[i].r + fft_output[i].i * fft_output[i].i);
+        
+        if (magnitude > maxAmplitude && (frequency > lowerCutoff || frequency < upperCutoff)) {
+            maxAmplitude = magnitude;
+            maxFrequency = frequency;
+        // Process or print the magnitude at each frequency bin
+        }
+    }
+
+    kiss_fft_free(cfg);
+    //return frequency;
+
 }
 
 void rearrange(float data_re[], float data_im[], const unsigned int N) {
