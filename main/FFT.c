@@ -2,13 +2,17 @@
 // Created by bert on 29/11/23.
 //
 
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 #include "FFT.h"
 
-#include "kiss_fft130/kiss_fft.h" 
-//#include <math.h>
+#include "kiss_fft130/kiss_fft.h"
+#include <math.h>
 
 
-float fft(float data_re[], const int N) {
+float fft(float data_re[], float *freq_bins, int N) {
     kiss_fft_cfg cfg = kiss_fft_alloc(N, 0, 0, 0);
 
     kiss_fft_cpx accelData[N];
@@ -30,6 +34,8 @@ float fft(float data_re[], const int N) {
         float sampleRate = 1000.0 / MS_BETWEEN_MEASUREMENTS; // Convert to seconds
         float frequency = i * sampleRate / N;
         float magnitude = sqrt(fft_output[i].r * fft_output[i].r + fft_output[i].i * fft_output[i].i);
+
+        freq_bins[N] = magnitude;
         
         if (magnitude > maxAmplitude && (frequency > lowerCutoff || frequency < upperCutoff)) {
             maxAmplitude = magnitude;
