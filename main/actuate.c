@@ -77,7 +77,7 @@ void actuate_main() {
         LED_output = (uint8_t)((rawSample + amplitude) * UINT8_MAX / (2.0 * amplitude));
 
         // DAC CODE
-        dac_val = adc_read >> 4;
+        dac_val = LED_output; //adc_read >> 4;
         ESP_ERROR_CHECK(dac_oneshot_output_voltage(dac_chan_handle, dac_val));
 
         vTaskDelay(pdMS_TO_TICKS(1));

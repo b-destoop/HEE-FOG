@@ -4,24 +4,24 @@
 
 #include "FFT.h"
 
-#include "kiss_fft130\kiss_fft.h" 
+#include "kiss_fft130/kiss_fft.h"
 //#include <math.h>
 #define MS_BETWEEN_MEASUREMENTS 50  //here for testing will put it in .h later
 
-void fft(float data_re[], const unsigned int N) {
+void fft(float data_re[], const int N) {
     kiss_fft_cfg cfg = kiss_fft_alloc(N, 0, 0, 0);
 
     kiss_fft_cpx accelData[N];
     for (unsigned int i = 0; i < N; ++i) {
         accelData[i].r = data_re[i];
-        accelData[i].i = 0.0;  // Assuming imaginary part is initially 0
+        accelData[i].i = 0.0f;  // Assuming imaginary part is initially 0
     }
 
     kiss_fft_cpx fft_output[N];
     kiss_fft(cfg, accelData, fft_output);
     
-    float maxFrequency = 0.0;
-    float maxAmplitude = 0.0;
+    float maxFrequency = 0.0f;
+    float maxAmplitude = 0.0f;
     float lowerCutoff = 1;
     float upperCutoff = 3;
 

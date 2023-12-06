@@ -7,7 +7,7 @@ void rearrange(float data_re[], float data_im[], unsigned int N);
 
 void compute(float data_re[], float data_im[], unsigned int N);
 
-void fft(float data_re[], unsigned int N);
+void fft(float data_re[], const int N);
 
 float findResonantFrequency(const float fftResult[], int arraySize, float sampleRate);
 
