@@ -139,6 +139,9 @@ def animate(i, axs):
     plot_fft_received_esp32(axs)
     plot_fft_from_raw(axs)
 
+    # COMPARISON
+    plot_max_amp_freq_esp32_vs_pc(axs)
+
 
 def plot_fft_received_esp32(axs):
     df_FFT_lock.acquire()
@@ -155,6 +158,11 @@ def plot_fft_received_esp32(axs):
         df_FFT_lock.release()
 
 
+max_freq_latest_pc_x = 0
+max_freq_latest_pc_y = 0
+max_freq_latest_pc_z = 0
+
+
 def plot_fft_from_raw(axs):
     # get the X_raw, Y_raw and Z_raw, ts data
     df_raw_lock.acquire()
@@ -163,13 +171,16 @@ def plot_fft_from_raw(axs):
     z_raw = dataframe_raw["Z_raw"]
     ts = dataframe_raw["ts"]
     df_raw_lock.release()
+
     # get average delta_ms for fft adjustment (from ts)
     avg_ms_measure = int(ts.tail(1000).diff().mean())  # limit to 1000 to ensure speed
     print("avg time: " + str(avg_ms_measure))
+
     # cut the PLOTTING_FFT_TIME_WDW_MS amount of samples from X_raw, Y_raw and Z_raw, ts
     x_raw_cut = x_raw[-int(PLOTTING_FFT_TIME_WDW_MS / avg_ms_measure):]
     y_raw_cut = y_raw[-int(PLOTTING_FFT_TIME_WDW_MS / avg_ms_measure):]
     z_raw_cut = z_raw[-int(PLOTTING_FFT_TIME_WDW_MS / avg_ms_measure):]
+
     # do the FFT on each of the previous collections (and return real frequencies)
     fft_x = fft.rfft(x_raw_cut)
     fft_y = fft.rfft(y_raw_cut)
@@ -178,6 +189,19 @@ def plot_fft_from_raw(axs):
                               d=avg_ms_measure / 1000)  # make the numbers on the axis in terms of freq = 1/s
     fft_y_freq = fft.rfftfreq(fft_y.size, d=avg_ms_measure / 1000)
     fft_z_freq = fft.rfftfreq(fft_z.size, d=avg_ms_measure / 1000)
+
+    # get the frequency with maximal amplitude
+    global max_freq_latest_pc_x, max_freq_latest_pc_y, max_freq_latest_pc_z
+
+    max_freq_x_idx = np.argmax(np.absolute(fft_x)[:len(fft_x_freq)])
+    max_freq_latest_pc_x = fft_x_freq[max_freq_x_idx]
+
+    max_freq_y_idx = np.argmax(np.absolute(fft_y)[:len(fft_y_freq)])
+    max_freq_latest_pc_y = fft_y_freq[max_freq_y_idx]
+
+    max_freq_z_idx = np.argmax(np.absolute(fft_z)[:len(fft_z_freq)])
+    max_freq_latest_pc_z = fft_z_freq[max_freq_z_idx]
+
     # plot the 3 FFTs on top of each other with some translucency
     ax: plt.Axes = axs[1][1]
     ax.clear()
@@ -188,6 +212,24 @@ def plot_fft_from_raw(axs):
     ax.set_title("FFT on pc")
     ax.legend(loc="upper left")
     # todo: plot the average FFT
+
+
+def plot_max_amp_freq_esp32_vs_pc(axs):
+    df_FFT_lock.acquire()
+    if "FFT_max_freq" in dataframe_FFT:
+        max_freq_latest = float(dataframe_FFT.tail(1)["FFT_max_freq"][0])
+        df_FFT_lock.release()
+
+        ax = axs[2][0]
+        ax.clear()
+        ax.set_title("max amplitude pc vs ESP32")
+        ax.bar(["ESP32", "PCx", "PCy", "PCz"], [
+            max_freq_latest,
+            max_freq_latest_pc_x,
+            max_freq_latest_pc_y,
+            max_freq_latest_pc_z])
+    if df_FFT_lock.locked():
+        df_FFT_lock.release()
 
 
 def draw_plot_for_data(axs, subplot_coord: (int, int), subplot_title: str, x_contents, plot_contents: list[str]):
@@ -233,7 +275,7 @@ thread_update_df.start()
 
 # DO ANIMATION
 
-fig, axs = plt.subplots(2, 2)
+fig, axs = plt.subplots(3, 2)
 
 # Set up plot to call animate() function periodically
 # interval = 0 because blocking queue.get in animate function
