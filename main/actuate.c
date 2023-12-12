@@ -66,15 +66,16 @@ void actuate_main() {
         // ADC CODE (one-shot mode)
         ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, ADC_CHAN, &adc_read));
         //ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC_CHAN, adc_read);
+
         // SIN WAVE CODE
         //---calculate time from start beat.
-        clock_t currentTime= clock();
-        double timeInSeconds = (double)(currentTime -startTime )/ CLOCKS_PER_SEC;
+        clock_t currentTime = clock();
+        double timeInSeconds = (double) (currentTime - startTime) / CLOCKS_PER_SEC;
         //---calculates sin at current time
-        double rawSample = amplitude * sin(2.0 * M_PI* frequency * timeInSeconds);
-        printf("%.2f\n", rawSample);
+        double rawSample = amplitude * sin(2.0 * M_PI * frequency * timeInSeconds);
+        ESP_LOGI(TAG, "%.2f\n", rawSample);
         //---Map the rawSample from the range [-amplitude, amplitude] to [0, UINT8_MAX] (UINT8 are positive integers)
-        LED_output = (uint8_t)((rawSample + amplitude) * UINT8_MAX / (2.0 * amplitude));
+        LED_output = (uint8_t) ((rawSample + amplitude) * UINT8_MAX / (2.0 * amplitude));
 
         // DAC CODE
         dac_val = adc_read >> 4;
