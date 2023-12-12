@@ -152,8 +152,8 @@ void analyze_main() {
                 printf("]; ");
 
                 //float sampleRate = 1000.0 / MS_BETWEEN_MEASUREMENTS; // Convert to seconds
-                float freq_magnitudes[ARRAY_SIZE] = {0.0f};
-                float resonantFreq = fft(AccelerometerDataX, &freq_magnitudes, ARRAY_SIZE);
+                float freq_magnitudes[ARRAY_SIZE];
+                float resonantFreq = fft(AccelerometerDataX, freq_magnitudes, ARRAY_SIZE);
 
                 printf("FFT_array_der=[");
                 for (unsigned int i = 0; i < ARRAY_SIZE; i++) {

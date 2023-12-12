@@ -10,9 +10,11 @@
 
 #include "kiss_fft130/kiss_fft.h"
 #include <math.h>
+#include <esp_log.h>
 
+static const char *TAG = "FFT";
 
-float fft(float data_re[], float *freq_bins, int N) {
+float fft(const float data_re[], float freq_bins[], int N) {
     kiss_fft_cfg cfg = kiss_fft_alloc(N, 0, 0, 0);
 
     kiss_fft_cpx accelData[N];
@@ -35,12 +37,12 @@ float fft(float data_re[], float *freq_bins, int N) {
         float frequency = i * sampleRate / N;
         float magnitude = sqrt(fft_output[i].r * fft_output[i].r + fft_output[i].i * fft_output[i].i);
 
-        freq_bins[N] = magnitude;
-        
+        freq_bins[i] = magnitude;
+
         if (magnitude > maxAmplitude && (frequency > lowerCutoff || frequency < upperCutoff)) {
             maxAmplitude = magnitude;
             maxFrequency = frequency;
-        // Process or print the magnitude at each frequency bin
+            // Process or print the magnitude at each frequency bin
         }
     }
 
@@ -97,7 +99,6 @@ void compute(float data_re[], float data_im[], const unsigned int N) {
         }
     }
 }
-
 
 
 float findResonantFrequency(const float *fftResult, const int arraySize, float sampleRate) {

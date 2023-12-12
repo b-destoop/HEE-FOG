@@ -143,7 +143,7 @@ def animate(i, axs):
 def plot_fft_received_esp32(axs):
     df_FFT_lock.acquire()
     if "FFT_array_in" in dataframe_FFT and "FFT_array_der" in dataframe_FFT:
-        fft_arr_in_latest_str = dataframe_FFT.tail(1)["FFT_array_in"][0]
+        fft_arr_in_latest_str = dataframe_FFT.tail(1)["FFT_array_der"][0]
         df_FFT_lock.release()
         fft_arr_in_latest = str_to_float_list(fft_arr_in_latest_str)
 
