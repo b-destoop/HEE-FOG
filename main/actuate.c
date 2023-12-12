@@ -27,18 +27,16 @@ static const char *TAG = "ACTUATE";
 void actuate_main() {
     ESP_LOGI(TAG, "Main started");
     //-------------SIN Init---------------//
-    uint8_t LED_output;
     clock_t startTime = clock(); // reset this value to restart sin on beat.
     const double amplitude = 5.0;
     double frequency = 1.0;  // Adjust as needed
+
     //-------------DAC Init---------------//
     dac_oneshot_handle_t dac_chan_handle;
     dac_oneshot_config_t dac_chan_cfg = {
             .chan_id = DAC_CHAN_0,
     };
     ESP_ERROR_CHECK(dac_oneshot_new_channel(&dac_chan_cfg, &dac_chan_handle));
-
-
     uint8_t dac_val = 0; //the output value of the DAC
 
     //-------------ADC1 Init---------------//
@@ -60,8 +58,8 @@ void actuate_main() {
         // FREQUENCY DERIVATION
         data_frame_t dataFrame;
         get_df_from_q(&dataFrame);
-        ESP_LOGI(TAG, "dataframe - ts: %lu, freq: %f, cue: %i", dataFrame.df_timestamp, dataFrame.resonant_frequency,
-                 dataFrame.cue);
+//        ESP_LOGI(TAG, "dataframe - ts: %lu, freq: %f, cue: %i", dataFrame.df_timestamp, dataFrame.resonant_frequency,
+//                 dataFrame.cue);
 
         // ADC CODE (one-shot mode)
         ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, ADC_CHAN, &adc_read));
@@ -73,12 +71,10 @@ void actuate_main() {
         double timeInSeconds = (double) (currentTime - startTime) / CLOCKS_PER_SEC;
         //---calculates sin at current time
         double rawSample = amplitude * sin(2.0 * M_PI * frequency * timeInSeconds);
-        ESP_LOGI(TAG, "%.2f\n", rawSample);
         //---Map the rawSample from the range [-amplitude, amplitude] to [0, UINT8_MAX] (UINT8 are positive integers)
-        LED_output = (uint8_t) ((rawSample + amplitude) * UINT8_MAX / (2.0 * amplitude));
+        dac_val = (uint8_t) ((rawSample + amplitude) * UINT8_MAX / (2.0 * amplitude));
 
         // DAC CODE
-        dac_val = adc_read >> 4;
         ESP_ERROR_CHECK(dac_oneshot_output_voltage(dac_chan_handle, dac_val));
 
         vTaskDelay(pdMS_TO_TICKS(1));
