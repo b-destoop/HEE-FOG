@@ -55,10 +55,12 @@ void actuate_main() {
     while (1) {
         // FREQUENCY DERIVATION
         data_frame_t dataFrame;
-        get_df_from_q(&dataFrame);
+        int res = get_df_from_q(&dataFrame);
 //        ESP_LOGI(TAG, "dataframe - ts: %lu, freq: %f, cue: %i", dataFrame.df_timestamp, dataFrame.resonant_frequency,
 //                 dataFrame.cue);
-        frequency = dataFrame.resonant_frequency;
+        if (res == 0){
+            frequency = dataFrame.resonant_frequency;
+        }
 
         // ADC CODE (one-shot mode)
         ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, LDR_CHAN, &adc_read));
