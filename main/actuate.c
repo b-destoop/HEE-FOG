@@ -29,7 +29,7 @@ void actuate_main() {
     //-------------SIN Init---------------//
     clock_t startTime = clock(); // reset this value to restart sin on beat.
     const double amplitude = 5.0;
-    double frequency = 1.0;  // Adjust as needed
+    float frequency = 1.0;  // Adjust as needed
 
     //-------------DAC Init---------------//
     dac_oneshot_handle_t dac_chan_handle;
@@ -60,6 +60,7 @@ void actuate_main() {
         get_df_from_q(&dataFrame);
 //        ESP_LOGI(TAG, "dataframe - ts: %lu, freq: %f, cue: %i", dataFrame.df_timestamp, dataFrame.resonant_frequency,
 //                 dataFrame.cue);
+        frequency = dataFrame.resonant_frequency;
 
         // ADC CODE (one-shot mode)
         ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, ADC_CHAN, &adc_read));
