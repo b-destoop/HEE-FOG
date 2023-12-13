@@ -7,6 +7,7 @@
 #include "analyze.h"
 #include "FFT.h"
 #include "thread.h"
+#include "angle_sensor.h"
 
 static const char *TAG = "analyze";
 
@@ -92,6 +93,9 @@ void analyze_main() {
     float AccelerometerDataZ[ARRAY_SIZE]; // you get the point, don't you?
     int itterator = 0;
 
+    // tube angle sensor setup
+    angle_sens_init();
+
     while (1) {
         if (i2c_master_read_slave(MPU6050_ADDR, 0x3B, data, sizeof(data)) == ESP_OK) {
             printf("ts=%lu; ", esp_log_timestamp());
@@ -123,7 +127,6 @@ void analyze_main() {
             AccelerometerDataZ[0] = accel_z;
 
 
-
             // Print raw data values
             printf("X_raw=%d; Y_raw=%d; Z_raw=%d; ", accel_x, accel_y, accel_z);
 
@@ -142,18 +145,18 @@ void analyze_main() {
 
             itterator = itterator + 1;
             float listIM[ARRAY_SIZE] = {0};  // Initialize listIM with zeros
-            float average_frequency = (fft(AccelerometerDataX, ARRAY_SIZE) + fft(AccelerometerDataY, ARRAY_SIZE) + fft(AccelerometerDataZ, ARRAY_SIZE))/3;
+            float average_frequency = (fft(AccelerometerDataX,listIM , ARRAY_SIZE) + fft(AccelerometerDataY,listIM, ARRAY_SIZE) + fft(AccelerometerDataZ, listIM,ARRAY_SIZE))/3;
             float CurrentFreq = average_frequency;
             static float prevFreq =0;
-            static count =0;
+            static int  count =0;
             float resonantFreq = 0.0;
             //printf("The value of myFloat is: %f\n",UnfilteredFreq);
             
             if ( CurrentFreq - prevFreq > prevFreq/6){ // /6 ????? -> à tester 
                 printf("Patient slows down, frequency is updated");
-                resonantFreq = CurrentFreq; // je suis Viktor. Mon francais etait tres bien. 
+                resonantFreq = CurrentFreq; 
             }
-            if (count%3 == 0) { // 3????? -> à tester à quoi ça correspond en terme de pas de marche 
+            if (count%3 == 0) {
                 resonantFreq = CurrentFreq;    
             }
             else{
@@ -172,15 +175,19 @@ void analyze_main() {
                 }
                 printf("]; ");
 
-                //fft(AccelerometerDataX, ARRAY_SIZE);
+                //float sampleRate = 1000.0 / MS_BETWEEN_MEASUREMENTS; // Convert to seconds
+                float freq_magnitudes[ARRAY_SIZE];
+                float resonantFreq = fft(AccelerometerDataX, freq_magnitudes, ARRAY_SIZE);
+
                 printf("FFT_array_der=[");
                 for (unsigned int i = 0; i < ARRAY_SIZE; i++) {
-                    printf("%f, ", AccelerometerDataX[i]);
+                    printf("%f, ", freq_magnitudes[i]);
                 }
                 printf("]; ");
-                //float sampleRate = 1000.0 / MS_BETWEEN_MEASUREMENTS; // Convert to seconds
+
                 //float resonantFreq = findResonantFrequency(AccelerometerDataX, ARRAY_SIZE, sampleRate);
-                //printf("FFT_max_freq=%d; ", resonantFreq[itterator]);
+
+                printf("FFT_max_freq=%f; ", resonantFreq);
                 data_frame_t output;
                 output.df_timestamp = esp_log_timestamp();
                 output.resonant_frequency = resonantFreq;
@@ -195,9 +202,11 @@ void analyze_main() {
             printf("Failed to read IMU's data\n");
         }
 
+        // tube angle sensor
+        double angle = angle_sens_read_angle();
+        //ESP_LOGI(TAG, "angle value: %f", angle);
 
     }
-
 
     ESP_LOGI(TAG, "Main ending...");
 }

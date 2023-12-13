@@ -2,13 +2,19 @@
 // Created by viktor
 //
 
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 #include "FFT.h"
 
-#include "kiss_fft130/kiss_fft.h" 
-//#include <math.h>
+#include "kiss_fft130/kiss_fft.h"
+#include <math.h>
+#include <esp_log.h>
 
+static const char *TAG = "FFT";
 
-float fft(float data_re[], const int N) {
+float fft(const float data_re[], float freq_bins[], int N) {
     kiss_fft_cfg cfg = kiss_fft_alloc(N, 0, 0, 0);
 
     kiss_fft_cpx accelData[N];
@@ -31,20 +37,16 @@ float fft(float data_re[], const int N) {
         float sampleRate = 1000.0 / MS_BETWEEN_MEASUREMENTS; // Convert to seconds
         float frequency = i * sampleRate / N;
         float magnitude = sqrt(fft_output[i].r * fft_output[i].r + fft_output[i].i * fft_output[i].i);
-        magnitudesList[i]=magnitude;
+
+        freq_bins[i] = magnitude;
+
         if (magnitude > maxAmplitude && (frequency > lowerCutoff || frequency < upperCutoff)) {
             maxAmplitude = magnitude;
             maxFrequency = frequency;
-        // Process or print the magnitude at each frequency bin
+            // Process or print the magnitude at each frequency bin
         }
     }
 
-    
-    printf("FFT_array_der=[");
-    for (unsigned int i = 0; i < ARRAY_SIZE; i++) {
-        printf("%f, ", magnitudesList[i]);
-    }
-    printf("]; ");
 
     kiss_fft_free(cfg);
     return maxFrequency;
@@ -99,7 +101,6 @@ void compute(float data_re[], float data_im[], const unsigned int N) {
         }
     }
 }
-
 
 
 float findResonantFrequency(const float *fftResult, const int arraySize, float sampleRate) {

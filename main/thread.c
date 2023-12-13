@@ -27,7 +27,7 @@ int put_df_in_q(data_frame_t data) {
 }
 
 int get_df_from_q(data_frame_t *data) {
-    int res = xQueueReceive(xQueue, data, 10000 / portTICK_PERIOD_MS);
+    int res = xQueueReceive(xQueue, data, 1); // avoid blocking actuate thread
     if (res == pdTRUE) return 0;
     else return -1;
 }
