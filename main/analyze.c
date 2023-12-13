@@ -142,6 +142,27 @@ void analyze_main() {
 
             itterator = itterator + 1;
             float listIM[ARRAY_SIZE] = {0};  // Initialize listIM with zeros
+            float average_frequency = (fft(AccelerometerDataX, ARRAY_SIZE) + fft(AccelerometerDataY, ARRAY_SIZE) + fft(AccelerometerDataZ, ARRAY_SIZE))/3;
+            float CurrentFreq = average_frequency;
+            static float prevFreq =0;
+            static count =0;
+            float resonantFreq = 0.0;
+            //printf("The value of myFloat is: %f\n",UnfilteredFreq);
+            
+            if ( CurrentFreq - prevFreq > prevFreq/6){ // /6 ????? -> à tester 
+                printf("Patient slows down, frequency is updated");
+                resonantFreq = CurrentFreq; // je suis Viktor. Mon francais etait tres bien. 
+            }
+            if (count%3 == 0) { // 3????? -> à tester à quoi ça correspond en terme de pas de marche 
+                resonantFreq = CurrentFreq;    
+            }
+            else{
+                resonantFreq = prevFreq;
+            }
+
+            prevFreq = CurrentFreq;
+            count = count + 1;
+
 
             if (itterator > ARRAY_SIZE) {
                 itterator = 0;
@@ -158,9 +179,8 @@ void analyze_main() {
                 }
                 printf("]; ");
                 //float sampleRate = 1000.0 / MS_BETWEEN_MEASUREMENTS; // Convert to seconds
-                float resonantFreq = fft(AccelerometerDataX, ARRAY_SIZE);
                 //float resonantFreq = findResonantFrequency(AccelerometerDataX, ARRAY_SIZE, sampleRate);
-                printf("FFT_max_freq=%f; ", resonantFreq);
+                //printf("FFT_max_freq=%d; ", resonantFreq[itterator]);
                 data_frame_t output;
                 output.df_timestamp = esp_log_timestamp();
                 output.resonant_frequency = resonantFreq;
@@ -181,3 +201,35 @@ void analyze_main() {
 
     ESP_LOGI(TAG, "Main ending...");
 }
+
+
+
+/*
+
+La vie
+
+La vie est un voyage,
+Un voyage sans fin,
+Un voyage plein de surprises,
+Un voyage plein de chagrins.
+
+Mais la vie est aussi un cadeau,
+Un cadeau précieux,
+Un cadeau qu'il faut chérir,
+Un cadeau qu'il faut savourer.
+
+Alors profitons de la vie,
+Profitons de chaque instant,
+Profitons de chaque sourire,
+Profitons de chaque pleur.
+
+Car la vie est trop courte,
+Pour la passer à se plaindre,
+Pour la passer à regretter,
+Pour la passer à avoir peur.
+
+Alors vivons la vie,
+Vivre la vie pleinement,
+Vivre la vie intensément,
+Vivre la vie avec passion.
+*/

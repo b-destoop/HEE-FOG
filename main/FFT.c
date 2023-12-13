@@ -1,5 +1,5 @@
 //
-// Created by bert on 29/11/23.
+// Created by viktor
 //
 
 #include "FFT.h"
@@ -24,19 +24,27 @@ float fft(float data_re[], const int N) {
     float maxAmplitude = 0.0f;
     float lowerCutoff = 1;
     float upperCutoff = 3;
+    float magnitudesList[ARRAY_SIZE];
 
     for (unsigned int i = 0; i < N; ++i) {
         // Calculate the frequency associated with each FFT bin
         float sampleRate = 1000.0 / MS_BETWEEN_MEASUREMENTS; // Convert to seconds
         float frequency = i * sampleRate / N;
         float magnitude = sqrt(fft_output[i].r * fft_output[i].r + fft_output[i].i * fft_output[i].i);
-        
+        magnitudesList[i]=magnitude;
         if (magnitude > maxAmplitude && (frequency > lowerCutoff || frequency < upperCutoff)) {
             maxAmplitude = magnitude;
             maxFrequency = frequency;
         // Process or print the magnitude at each frequency bin
         }
     }
+
+    
+    printf("FFT_array_der=[");
+    for (unsigned int i = 0; i < ARRAY_SIZE; i++) {
+        printf("%f, ", magnitudesList[i]);
+    }
+    printf("]; ");
 
     kiss_fft_free(cfg);
     return maxFrequency;

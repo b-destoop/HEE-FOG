@@ -61,7 +61,7 @@ void actuate_main() {
         data_frame_t dataFrame;
         get_df_from_q(&dataFrame);
         ESP_LOGI(TAG, "dataframe - ts: %lu, freq: %f, cue: %i", dataFrame.df_timestamp, dataFrame.resonant_frequency,
-                 dataFrame.cue);
+                dataFrame.cue);
 
         // ADC CODE (one-shot mode)
         ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, ADC_CHAN, &adc_read));
@@ -72,7 +72,7 @@ void actuate_main() {
         double timeInSeconds = (double)(currentTime -startTime )/ CLOCKS_PER_SEC;
         //---calculates sin at current time
         double rawSample = amplitude * sin(2.0 * M_PI* frequency * timeInSeconds);
-        printf("%.2f\n", rawSample);
+        //printf("%.2f\n", rawSample);
         //---Map the rawSample from the range [-amplitude, amplitude] to [0, UINT8_MAX] (UINT8 are positive integers)
         LED_output = (uint8_t)((rawSample + amplitude) * UINT8_MAX / (2.0 * amplitude));
 
