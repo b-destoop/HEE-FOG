@@ -18,12 +18,14 @@
 #include "analyze.h"
 #include "actuate.h"
 #include "thread.h"
+# include "time.h"
 
 
 /* Use project configuration menu (idf.py menuconfig) to choose the GPIO to blink,
    or you can edit the following line and set a number here.
 */
 #define BLINK_GPIO CONFIG_BLINK_GPIO
+
 
 
 void app_main(void) {
@@ -43,7 +45,7 @@ void app_main(void) {
     // must exist for the lifetime of the task, so in this case is declared static.  If it was just an
     // an automatic stack variable it might no longer exist, or at least have been corrupted, by the time
     // the new task attempts to access it.
-    xTaskCreate(analyze_main, "ANALYZE", CONFIG_ESP_MAIN_TASK_STACK_SIZE,
+    xTaskCreate(analyze_main, "ANALYZE", CONFIG_ESP_MAIN_TASK_STACK_SIZE *2 ,
                 NULL, tskIDLE_PRIORITY, &analyze_task_handle);
     configASSERT(analyze_task_handle);
     xTaskCreate(actuate_main, "ACTUATE", CONFIG_ESP_MAIN_TASK_STACK_SIZE,
