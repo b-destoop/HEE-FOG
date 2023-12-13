@@ -10,9 +10,7 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 #include "sdkconfig.h"
-#include "hal/ledc_types.h"
 #include "thread.h"
-#include <stdio.h>
 #include <time.h>
 #include <math.h>
 #include <stdint.h>
@@ -20,7 +18,7 @@
 
 // ADC DEFINES
 #define ADC_ATTEN           ADC_ATTEN_DB_11
-#define ADC_CHAN            ADC1_GPIO36_CHANNEL
+#define LDR_CHAN            ADC1_GPIO36_CHANNEL
 
 static const char *TAG = "ACTUATE";
 
@@ -52,7 +50,7 @@ void actuate_main() {
             .bitwidth = ADC_BITWIDTH_DEFAULT,
             .atten = ADC_ATTEN,
     };
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, ADC_CHAN, &adc_config));
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, LDR_CHAN, &adc_config));
 
     while (1) {
         // FREQUENCY DERIVATION
@@ -63,7 +61,7 @@ void actuate_main() {
         frequency = dataFrame.resonant_frequency;
 
         // ADC CODE (one-shot mode)
-        ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, ADC_CHAN, &adc_read));
+        ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, LDR_CHAN, &adc_read));
         //ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC_CHAN, adc_read);
 
         // SIN WAVE CODE

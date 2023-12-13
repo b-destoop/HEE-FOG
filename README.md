@@ -34,6 +34,10 @@ pin connections:
 | 36       | potentiometer in |
 | 5        | motor output     |
 | 25       | DAC out          |
+|          | *LED SENSOR*     |
+| 21       | button           |
+| 3.3V     | led              |
+| 4        | LDR in           |
 
 - Potentiometer is to control the amount of output voltage for the vibration motor
 

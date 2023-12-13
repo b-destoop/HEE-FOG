@@ -7,6 +7,7 @@
 #include "analyze.h"
 #include "FFT.h"
 #include "thread.h"
+#include "angle_sensor.h"
 
 static const char *TAG = "analyze";
 
@@ -92,6 +93,9 @@ void analyze_main() {
     float AccelerometerDataZ[ARRAY_SIZE]; // you get the point, don't you?
     int itterator = 0;
 
+    // tube angle sensor setup
+    angle_sens_init();
+
     while (1) {
         if (i2c_master_read_slave(MPU6050_ADDR, 0x3B, data, sizeof(data)) == ESP_OK) {
             printf("ts=%lu; ", esp_log_timestamp());
@@ -121,7 +125,6 @@ void analyze_main() {
             AccelerometerDataX[0] = accel_x;
             AccelerometerDataY[0] = accel_y;
             AccelerometerDataZ[0] = accel_z;
-
 
 
             // Print raw data values
@@ -178,9 +181,11 @@ void analyze_main() {
             printf("Failed to read IMU's data\n");
         }
 
+        // tube angle sensor
+        double angle = angle_sens_read_angle();
+        //ESP_LOGI(TAG, "angle value: %f", angle);
 
     }
-
 
     ESP_LOGI(TAG, "Main ending...");
 }
