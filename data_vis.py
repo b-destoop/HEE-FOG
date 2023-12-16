@@ -207,8 +207,8 @@ def plot_fft_from_raw(axs):
     ax.clear()
     transparency = 0.75
     ax.plot(fft_x_freq, np.absolute(fft_x)[:len(fft_x_freq)], label="fft x", alpha=transparency)
-    ax.plot(fft_y_freq, np.absolute(fft_x)[:len(fft_y_freq)], label="fft y", alpha=transparency)
-    ax.plot(fft_z_freq, np.absolute(fft_x)[:len(fft_z_freq)], label="fft z", alpha=transparency)
+    ax.plot(fft_y_freq, np.absolute(fft_y)[:len(fft_y_freq)], label="fft y", alpha=transparency)
+    ax.plot(fft_z_freq, np.absolute(fft_z)[:len(fft_z_freq)], label="fft z", alpha=transparency)
     ax.set_title("FFT on pc")
     ax.legend(loc="upper left")
     # todo: plot the average FFT
