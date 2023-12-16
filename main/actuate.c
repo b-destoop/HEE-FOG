@@ -11,6 +11,7 @@
 #include "esp_log.h"
 #include "sdkconfig.h"
 #include "thread.h"
+#include "angle_sensor.h"
 #include <time.h>
 #include <math.h>
 #include <stdint.h>
@@ -28,6 +29,7 @@ void actuate_main() {
     clock_t startTime = clock(); // reset this value to restart sin on beat.
     const double amplitude = 5.0;
     float frequency = 1.0;  // Adjust as needed
+    wearer_state_t wearerState = WALKING;
 
     //-------------DAC Init---------------//
     dac_oneshot_handle_t dac_chan_handle;
@@ -58,8 +60,9 @@ void actuate_main() {
         int res = get_df_from_q(&dataFrame);
 //        ESP_LOGI(TAG, "dataframe - ts: %lu, freq: %f, cue: %i", dataFrame.df_timestamp, dataFrame.resonant_frequency,
 //                 dataFrame.cue);
-        if (res == 0){
+        if (res == 0) {
             frequency = dataFrame.resonant_frequency;
+            wearerState = dataFrame.wearerState;
         }
 
         // ADC CODE (one-shot mode)
@@ -76,7 +79,8 @@ void actuate_main() {
         dac_val = (uint8_t) ((rawSample + amplitude) * UINT8_MAX / (2.0 * amplitude));
 
         // DAC CODE
-        ESP_ERROR_CHECK(dac_oneshot_output_voltage(dac_chan_handle, dac_val));
+        if (wearerState == WALKING)
+            ESP_ERROR_CHECK(dac_oneshot_output_voltage(dac_chan_handle, dac_val));
 
         vTaskDelay(pdMS_TO_TICKS(1));
     }

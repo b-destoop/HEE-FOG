@@ -171,6 +171,12 @@ void analyze_main() {
                 output.df_timestamp = esp_log_timestamp();
                 output.resonant_frequency = resonantFreq;
                 output.cue = False;
+
+                // tube angle sensor
+                double angle = angle_sens_read_angle();
+                //ESP_LOGI(TAG, "angle value: %f", angle);
+                output.wearerState = get_wearer_state();
+
                 put_df_in_q(output);
             }
 
@@ -181,9 +187,6 @@ void analyze_main() {
             printf("Failed to read IMU's data\n");
         }
 
-        // tube angle sensor
-        double angle = angle_sens_read_angle();
-        //ESP_LOGI(TAG, "angle value: %f", angle);
 
     }
 
