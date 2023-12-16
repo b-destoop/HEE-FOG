@@ -4,16 +4,9 @@
 
 #include "angle_sensor.h"
 
-#include <stdio.h>
-#include "esp_log.h"
-#include "driver/i2c.h"
 #include "analyze.h"
-#include "FFT.h"
-#include "thread.h"
-#include "angle_sensor.h"
 #include <esp_adc/adc_oneshot.h>
 #include <soc/adc_channel.h>
-#include "driver/gpio.h"
 #include <math.h>
 
 #define LDR_CHAN ADC2_GPIO4_CHANNEL
@@ -45,6 +38,12 @@ double angle_sens_read_angle() {
     double angleValue;
     ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, LDR_CHAN, &ldrValue));
     angleValue =  -36.73 * log(ldrValue) + 291.83;
-    ESP_LOGI(TAG, "ldr_value: %i - angleValue: %f", ldrValue, angleValue);
     return angleValue;
 }
+
+wearer_state_t get_wearer_state() {
+    double angle = angle_sens_read_angle();
+    if(angle > 70) return SITTING;
+    else return WALKING;
+}
+
