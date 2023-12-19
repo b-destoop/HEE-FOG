@@ -45,6 +45,5 @@ double angle_sens_read_angle() {
     double angleValue;
     ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, LDR_CHAN, &ldrValue));
     angleValue =  -36.73 * log(ldrValue) + 291.83;
-    ESP_LOGI(TAG, "ldr_value: %i - angleValue: %f", ldrValue, angleValue);
     return angleValue;
 }
