@@ -228,6 +228,11 @@ def plot_max_amp_freq_esp32_vs_pc(axs):
             max_freq_latest_pc_x,
             max_freq_latest_pc_y,
             max_freq_latest_pc_z])
+        ax.text(0, max_freq_latest, max_freq_latest)
+        ax.text(1, max_freq_latest_pc_x, max_freq_latest_pc_x)
+        ax.text(2, max_freq_latest_pc_y, max_freq_latest_pc_y)
+        ax.text(3, max_freq_latest_pc_z, max_freq_latest_pc_z)
+
     if df_FFT_lock.locked():
         df_FFT_lock.release()
 
