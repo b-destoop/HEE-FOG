@@ -56,3 +56,5 @@ dkms.conf
 /managed_components/
 /.vscode/
 /CMakeFiles/
+__pycache__
+
